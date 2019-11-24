@@ -1,0 +1,12 @@
+#!/bin/bash
+
+docker image build \
+    -t jclaveau/php-multiversion:latest \
+    .
+
+cat << EOF
+Push to Docker Hub with:
+
+docker image push jclaveau/php-multiversion:latest
+
+EOF
