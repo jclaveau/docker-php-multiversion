@@ -4,6 +4,8 @@ docker image build \
     -t jclaveau/php-multiversion:latest \
     .
 
+# sudo apt install gnupg2 pass
+# docker login
 cat << EOF
 Push to Docker Hub with:
 

@@ -69,7 +69,7 @@ done
 
 apt-get install --no-install-recommends --no-install-suggests -y \
     php-xdebug\
-    docker
+    docker.io
 
 apt-get -y --purge autoremove &&\
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/{man,doc}
