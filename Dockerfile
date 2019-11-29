@@ -23,3 +23,5 @@ RUN install -d -m 0755 -o www-data -g www-data /.composer &&\
 # RUN chmod +x /usr/bin/xdebug
 
 # EXPOSE 9000
+
+CMD ["/sbin/my_init"]
