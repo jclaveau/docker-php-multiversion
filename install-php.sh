@@ -8,13 +8,17 @@ apt-get update &&\
         git \
         gnupg \
         unzip \
+        nano \
+        htop \
+        nmap \
+        net-tools \
         zip &&\
 
 add-apt-repository ppa:ondrej/php
 apt-get update
 
-# versions=(5.6 7.0)
-versions=(5.6 7.0 7.1 7.2 7.3)
+versions=(5.6 7.0 7.1 7.2 7.3 7.4)
+# versions=(7.4)
 for php_version in "${versions[@]}"
 do
     apt-get install -y \
