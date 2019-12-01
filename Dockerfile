@@ -8,8 +8,8 @@ RUN update-alternatives --install /bin/sh sh /bin/bash 100
 
 # Most common PHP modules, and Composer
 # First group of modules are enabled by default
-COPY install-php.sh .
-RUN ./install-php.sh
+COPY install-packages.sh .
+RUN ./install-packages.sh
 
 # Install the latest Composer (Phusion one is old)
 RUN install -d -m 0755 -o www-data -g www-data /.composer &&\
