@@ -5,7 +5,7 @@ Use PHP in the version you prefer or multiple ones with nothing more than Docker
 ```
 curl -fsSL https://raw.githubusercontent.com/jclaveau/docker-php-multiversion/master/installer.sh | sh
 
-grep -qxF 'PATH=~/opt/bin:$PATH' ~/.profile || echo 'PATH=~/opt/bin:$PATH' >> ~/.profile
+grep -qxF 'PATH=$PATH:~/opt/bin' ~/.profile || echo 'PATH=$PATH:~/opt/bin' >> ~/.profile
 source ~/.profile
 ```
 
