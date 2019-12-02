@@ -1,5 +1,5 @@
-# WIP: docker-php-multiversion
-Use PHP in the version you prefer or multiple ones with nothing more than Docker installed for development purpose.
+# Docker PHP Multiversion
+Use PHP in the version you prefer with nothing more than Docker installed (for development purpose).
 
 [![Build Status](https://travis-ci.org/jclaveau/docker-php-multiversion.png?branch=master)](https://travis-ci.org/jclaveau/docker-php-multiversion)
 [![codecov](https://codecov.io/gh/jclaveau/docker-php-multiversion/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/docker-php-multiversion)
