@@ -46,8 +46,6 @@ function run_docker() {
 }
 
 function exec_in_docker() {
-    echo "Docker: $@"
-
     # avoid https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
     test -t 1 && USE_TTY="-t" 
 
