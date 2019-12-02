@@ -1,5 +1,12 @@
 Describe "php"
     Include ./functions.bash
+    
+    It "runs docker"
+        When call run_docker $(pwd)
+        
+        The stdout should eq ""
+        The stderr should eq ""
+    End
     It "runs php in multiple versions"
         When run source ./php 5.6 7.0 7.3 spec/phpversion.php
         The line 1 of stdout should eq "5.6"
