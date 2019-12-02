@@ -41,7 +41,7 @@ function run_docker() {
             --name $CONTAINER_NAME \
             --workdir $LIBRARY_DIR \
             --volume $LIBRARY_DIR:$LIBRARY_DIR \
-            jclaveau/php-multiversion
+            jclaveau/php-multiversion > /dev/null
     fi
 }
 
