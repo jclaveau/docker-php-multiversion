@@ -15,6 +15,14 @@ Describe "php"
         The line 1 of stdout should eq $latest_version
         The stderr should eq ""
     End
+    It "runs php in default version (latest)"
+        run_docker $(pwd)
+        latest_version=$(latest_php_version)
+
+        When run source ./php $latest_version spec/phpversion.php
+        The line 1 of stdout should eq $latest_version
+        The stderr should eq ""
+    End
     It "runs php in unsupported 5.5 without blocking"
         When run source ./php 5.5 5.6 spec/phpversion.php
         The line 1 of stdout should eq "Unsupported PHP version: 5.5"
