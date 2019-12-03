@@ -35,9 +35,17 @@ Describe "php"
         The line 1 of stdout should eq "Unsupported PHP version: 5.5"
         The line 2 of stdout should eq "5.6"
     End
+    fIt "runs php in 5.6 from symlink"
+        script_dir=$(dirname "$(readlink -f ".php")")
+        ln -s $script_dir/php /tmp/php_for_testing
+        When run source /tmp/php_for_testing 5.6 spec/phpversion.php
+        rm /tmp/php_for_testing
+        The stdout should eq "5.6"
+        The stderr should eq ""
+    End
     It "runs php in 5.6"
         When run source ./php 5.6 spec/phpversion.php
-        The line 1 of stdout should eq "5.6"
+        The stdout should eq "5.6"
         The stderr should eq ""
     End
     It "runs php in 7.0"

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source functions.bash
+script_dir=$(dirname "$(readlink -f "$0")")
+
+source $script_dir/functions.bash
 
 if ! in_docker_container; then 
     install_docker_if_missing
