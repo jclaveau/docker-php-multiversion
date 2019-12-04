@@ -24,23 +24,27 @@ function install_docker_if_missing() {
 function run_docker() {
     LIBRARY_DIR=$1
     CONTAINER_NAME=php-mv'_'$(echo $LIBRARY_DIR | sed "s|[^[:alpha:].-]|_|g")
-    
-    # echo $LIBRARY_DIR
-    # echo $CONTAINER_NAME
-    
-    if [ -z "$(docker ps -l | grep $CONTAINER_NAME)" ]; then
+        
+    if [ -z "$(docker ps -l | grep $CONTAINER_NAME$)" ]; then
         # echo "Running new docker jclaveau/php-multiversion for $(pwd)"
+        if [ "$HOME" != "$LIBRARY_DIR" ]; then
+            lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR" 
+        else
+            lib_volume_option=''
+        fi
+        
         docker run \
             -d \
             --rm \
-            --volume=$HOME:$HOME:rw \
+            --volume=$HOME:$HOME:ro \
+            --volume=$HOME/.composer:$HOME/.composer:rw \
+            $lib_volume_option \
             --volume=/etc/group:/etc/group:ro \
             --volume=/etc/passwd:/etc/passwd:ro \
             --volume=/etc/shadow:/etc/shadow:ro \
             --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
             --name $CONTAINER_NAME \
             --workdir $LIBRARY_DIR \
-            --volume $LIBRARY_DIR:$LIBRARY_DIR \
             jclaveau/php-multiversion > /dev/null
     fi
 }
