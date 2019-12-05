@@ -54,6 +54,20 @@ Describe "php"
         The stdout should eq "5.6"
         The stderr should eq ""
     End
+    fIt "runs multiple php containers and kill them"
+        # clean the containers first
+        working_dir=$(pwd)
+        $working_dir/php kill-containers
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd ..
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd $working_dir
+        When run source $working_dir/php kill-containers
+        The line 1 of stdout should not be blank # TODO pattern hexa
+        The line 2 of stdout should not be blank
+        # The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
     It "runs php in 5.6"
         When run source ./php 5.6 spec/phpversion.php
         The stdout should eq "5.6"

@@ -61,3 +61,13 @@ function exec_in_docker() {
 function latest_php_version() {
     exec_in_docker update-alternatives --query php | grep Best | sed "s/^[^[:digit:]]*//"
 }
+
+function kill_containers() {
+    container_ids=$(
+        docker ps --format '{{.ID}} {{.Image}}' | awk '$2 ~ /^jclaveau\/php-multiversion(:\w+)?$/ { print $1}'
+    )
+    
+    if [ -n "$container_ids" ]; then
+        docker kill $container_ids
+    fi
+}

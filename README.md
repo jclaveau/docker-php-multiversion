@@ -29,6 +29,10 @@ $ php 7.1 vendor/bin/phpunit
 ```
 And with `composer` with a little more hacking i work on in my [PHP Library Development Toolkit](https://github.com/jclaveau/php-library-development-toolkit)
 
+You can also kill all running php-multiversion containers 
+```shell
+$ php kill-containers
+```
 
 ## PHP Versions
 This docker image provides all PHP versions available in [Ondřej Surý's PPA](https://github.com/oerdnj/deb.sury.org).

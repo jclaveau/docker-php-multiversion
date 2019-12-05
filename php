@@ -11,6 +11,11 @@ fi
 versions=()
 
 while :; do
+    if [ $1 == 'kill-containers' ]; then 
+        kill_containers
+        exit
+    fi
+    
     if awk -v version=$1 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then 
         # not a version
         break
