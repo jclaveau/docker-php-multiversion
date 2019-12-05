@@ -35,11 +35,22 @@ Describe "php"
         The line 1 of stdout should eq "Unsupported PHP version: 5.5"
         The line 2 of stdout should eq "5.6"
     End
-    fIt "runs php in 5.6 from symlink"
+    It "runs php in 5.6 from symlink"
         script_dir=$(dirname "$(readlink -f ".php")")
         ln -s $script_dir/php /tmp/php_for_testing
         When run source /tmp/php_for_testing 5.6 spec/phpversion.php
         rm /tmp/php_for_testing
+        The stdout should eq "5.6"
+        The stderr should eq ""
+    End
+    It "runs multiple php containers and rerun the first one without conflict"
+        # https://github.com/jclaveau/docker-php-multiversion/issues/16
+        working_dir=$(pwd)
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd ..
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd $working_dir
+        When run source $working_dir/php 5.6 spec/phpversion.php
         The stdout should eq "5.6"
         The stderr should eq ""
     End

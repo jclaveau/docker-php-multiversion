@@ -25,7 +25,7 @@ function run_docker() {
     LIBRARY_DIR=$1
     CONTAINER_NAME=php-mv'_'$(echo $LIBRARY_DIR | sed "s|[^[:alpha:].-]|_|g")
         
-    if [ -z "$(docker ps -l | grep $CONTAINER_NAME$)" ]; then
+    if [ -z "$(docker ps -a | grep $CONTAINER_NAME$)" ]; then
         # echo "Running new docker jclaveau/php-multiversion for $(pwd)"
         if [ "$HOME" != "$LIBRARY_DIR" ]; then
             lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR" 
