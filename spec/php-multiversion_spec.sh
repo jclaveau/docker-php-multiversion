@@ -1,5 +1,5 @@
 Describe "php"
-    Include ./functions.bash
+    Include ./lib/functions.bash
     
     It "runs docker"
         When call run_docker $(pwd)
