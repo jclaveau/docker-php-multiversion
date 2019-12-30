@@ -24,15 +24,15 @@ function install_docker_if_missing() {
 function run_docker() {
     LIBRARY_DIR=$1
     CONTAINER_NAME=php-mv'_'$(echo $LIBRARY_DIR | sed "s|[^[:alpha:].-]|_|g")
-        
+
     if [ -z "$(docker ps -a | grep $CONTAINER_NAME$)" ]; then
         # echo "Running new docker jclaveau/php-multiversion for $(pwd)"
         if [ "$HOME" != "$LIBRARY_DIR" ]; then
-            lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR" 
+            lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR"
         else
             lib_volume_option=''
         fi
-        
+
         docker run \
             -d \
             --rm \
@@ -51,7 +51,7 @@ function run_docker() {
 
 function exec_in_docker() {
     # avoid https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
-    test -t 1 && USE_TTY="-t" 
+    test -t 1 && USE_TTY="-t"
 
     docker exec -i ${USE_TTY} \
         --user $(id -u):$(id -g) \
@@ -66,7 +66,7 @@ function kill_containers() {
     container_ids=$(
         docker ps --format '{{.ID}} {{.Image}}' | awk '$2 ~ /^jclaveau\/php-multiversion(:\w+)?$/ { print $1}'
     )
-    
+
     if [ -n "$container_ids" ]; then
         docker kill $container_ids
     fi

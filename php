@@ -4,29 +4,29 @@ script_dir=$(dirname "$(readlink -f "$0")")
 
 source $script_dir/lib/functions.bash
 
-if ! in_docker_container; then 
+if ! in_docker_container; then
     install_docker_if_missing
 fi
 
 versions=()
 
 while :; do
-    if [ $1 == 'kill-containers' ]; then 
+    if [ $1 == 'kill-containers' ]; then
         kill_containers
         exit
     fi
-    
-    if awk -v version=$1 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then 
+
+    if awk -v version=$1 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break
     fi
-    
-    if awk -v version=$1 'BEGIN{ exit (version == 5.6 || version >= 7) }' ; then 
+
+    if awk -v version=$1 'BEGIN{ exit (version == 5.6 || version >= 7) }' ; then
         echo "Unsupported PHP version: $1"
     else
         versions+=($1)
     fi
-    
+
     shift
 done
 
@@ -34,17 +34,17 @@ if [ ${#versions[@]} == 0 ]; then
     versions+=("")
 fi
 
-if in_docker_container; then 
-    # we do not need to restart a container with php multiversion as we already are in 
-    for version in "${versions[@]}"; 
-    do 
+if in_docker_container; then
+    # we do not need to restart a container with php multiversion as we already are in
+    for version in "${versions[@]}";
+    do
         php$version "$@"
     done
-else 
+else
     run_docker $(pwd)
 
-    for version in "${versions[@]}"; 
-    do 
+    for version in "${versions[@]}";
+    do
         exec_in_docker php$version "$@"
     done
 fi
