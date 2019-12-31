@@ -1,9 +1,9 @@
 Describe "php"
     Include ./lib/functions.bash
-    
+
     It "runs docker"
         When call run_docker $(pwd)
-        
+
         The stdout should eq ""
         The stderr should eq ""
     End
@@ -54,7 +54,7 @@ Describe "php"
         The stdout should eq "5.6"
         The stderr should eq ""
     End
-    fIt "runs multiple php containers and kill them"
+    It "runs multiple php containers and kill them"
         # clean the containers first
         working_dir=$(pwd)
         $working_dir/php kill-containers
@@ -66,6 +66,15 @@ Describe "php"
         The line 1 of stdout should not be blank # TODO pattern hexa
         The line 2 of stdout should not be blank
         # The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
+    It "runs php with environment variables"
+        COMPOSER_VENDOR_DIR='custom_vendor'
+        export COMPOSER_VENDOR_DIR
+        # export is required until inline environment variables are supported by Shellspec
+        # When run source "COMPOSER_VENDOR_DIR='custom_vendor' ./php spec/getenv_composer_vendor_dir.php"
+        When run source ./php spec/getenv_composer_vendor_dir.php
+        The stdout should eq "COMPOSER_VENDOR_DIR=custom_vendor"
         The stderr should eq ""
     End
     It "runs php in 5.6"

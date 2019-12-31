@@ -53,9 +53,36 @@ function exec_in_docker() {
     # avoid https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
     test -t 1 && USE_TTY="-t"
 
-    docker exec -i ${USE_TTY} \
+    # Pass all environment variables to the container to mimic the development on the host
+    readarray -t printenv_array <<< "$(printenv)"
+    printenv_array_length=${#printenv_array[@]}
+    environment_vars=()
+    for (( i=0; i<${printenv_array_length}+1; i++ ));
+    do
+        if [[ ${printenv_array[i]} != "" ]]; then
+            readarray -t parts <<< "$(sed '0,/=/s//\n/' <<< "${printenv_array[$i]}")" # split by first =
+            if [[ "${parts[1]}" != "PATH" ]]; then
+                value=$(sed -e "s/'/'\\\\''/g; 1s/^/'/; \$s/\$/'/" <<< "${parts[1]}") # escaping
+                environment_vars+=("${parts[0]}=$value") # escape quoted value
+            fi
+        fi
+    done
+
+    if [ ${#environment_vars[@]} == 0 ]; then
+        inline_env=''
+    else
+        inline_env=$(printf " --env %s" "${environment_vars[@]}")
+    fi
+
+    command="\
+        docker exec -i ${USE_TTY} \
         --user $(id -u):$(id -g) \
-        $CONTAINER_NAME "$@"
+        $inline_env \
+        $CONTAINER_NAME $@"
+
+    # echo $command
+    # echo ""
+    eval $command
 }
 
 function latest_php_version() {

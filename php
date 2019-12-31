@@ -6,6 +6,8 @@ source $script_dir/lib/functions.bash
 
 if ! in_docker_container; then
     install_docker_if_missing
+# else
+    # echo "in_docker_container"
 fi
 
 versions=()
@@ -38,7 +40,9 @@ if in_docker_container; then
     # we do not need to restart a container with php multiversion as we already are in
     for version in "${versions[@]}";
     do
-        php$version "$@"
+        # In case php multiversion is run from ~/.local/bin calling "php -v"
+        # will loop infinitelly so we force the next php to be found in /usr/bin
+        PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' php$version "$@"
     done
 else
     run_docker $(pwd)
