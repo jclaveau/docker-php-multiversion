@@ -42,6 +42,12 @@ function run_docker() {
             lib_volume_option=''
         fi
 
+        if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
+            docker_image_version='0.1.0'
+        else
+            docker_image_version=$PHP_MULTIVERSION_IMAGE
+        fi
+
         docker run \
             -d \
             --rm \
@@ -54,7 +60,7 @@ function run_docker() {
             --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
             --name $CONTAINER_NAME \
             --workdir $LIBRARY_DIR \
-            jclaveau/php-multiversion > /dev/null
+            jclaveau/php-multiversion:$docker_image_version > /dev/null
     fi
 }
 
@@ -100,7 +106,7 @@ function latest_php_version() {
 
 function kill_containers() {
     container_ids=$(
-        docker ps --format '{{.ID}} {{.Image}}' | awk '$2 ~ /^jclaveau\/php-multiversion(:\w+)?$/ { print $1}'
+        docker ps --format '{{.ID}} {{.Image}}' | awk '$2 ~ /^jclaveau\/php-multiversion(:.+)?$/ { print $1}'
     )
 
     if [ -n "$container_ids" ]; then

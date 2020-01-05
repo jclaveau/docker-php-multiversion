@@ -4,11 +4,20 @@ docker image build \
     -t jclaveau/php-multiversion:latest \
     .
 
-# sudo apt install gnupg2 pass
-# docker login
-cat << EOF
+
+php kill-containers
+
+PHP_MULTIVERSION_IMAGE='latest'
+PHP_MULTIVERSION_IMAGE="$PHP_MULTIVERSION_IMAGE" shellspec
+shellspec_result=$?
+
+if [ $shellspec_result == 0 ]; then
+    # sudo apt install gnupg2 pass
+    # docker login
+    cat << EOF
 Push to Docker Hub with:
 
-docker image push jclaveau/php-multiversion:latest
+docker image push jclaveau/php-multiversion:$PHP_MULTIVERSION_IMAGE
 
 EOF
+fi
