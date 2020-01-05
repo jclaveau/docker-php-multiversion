@@ -8,15 +8,24 @@ function in_docker_container() {
 }
 
 function install_docker_if_missing() {
-    docker_path=$(command -v docker)
+    docker_path=$(command -v docker || echo "") # command -v docker fails under shellspec if PATH=""
     if [ -z "$docker_path" ]; then
-        # echo "docker not installed"
-        echo $docker_path
+        echo "docker not installed"
+        # echo $docker_path
         read -p "Do you want to install docker? " -n 1 -r
         # echo    # (optional) move to a new line
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
-            sudo apt-get install docker
+            echo "sudo apt-get install docker.io"
+
+            docker_installed=$(sudo apt-get install docker.io 2> /dev/null || (echo "failed"))
+            if [ $docker_installed == "failed" ]; then
+                echo "Unable to launch docker installation. Please do it manually."
+                exit
+            fi
+        else
+            echo "Docker.io is required"
+            exit
         fi
     fi
 }

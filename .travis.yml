@@ -1,7 +1,7 @@
 language: sh
 matrix:
   include:
-    - os: linux 
+    - os: linux
       dist: xenial
 before_install:
   - sudo apt-get update

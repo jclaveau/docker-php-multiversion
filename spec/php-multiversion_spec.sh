@@ -69,13 +69,46 @@ Describe "php"
         The stderr should eq ""
     End
     It "runs php with environment variables"
-        COMPOSER_VENDOR_DIR='custom_vendor'
-        export COMPOSER_VENDOR_DIR
+        BeforeRun "export COMPOSER_VENDOR_DIR='custom_vendor'"
         # export is required until inline environment variables are supported by Shellspec
         # When run source "COMPOSER_VENDOR_DIR='custom_vendor' ./php spec/getenv_composer_vendor_dir.php"
         When run source ./php spec/getenv_composer_vendor_dir.php
         The stdout should eq "COMPOSER_VENDOR_DIR=custom_vendor"
         The stderr should eq ""
+    End
+    It "checks that docker.io is installed and don't"
+        # change the $PATH to a directory not containing 'docker'
+        mkdir -p spec/tmp_bin
+        ln -s -f "$(command -v dirname)" spec/tmp_bin/dirname
+        ln -s -f "$(command -v readlink)" spec/tmp_bin/readlink
+        ln -s -f "$(command -v grep)" spec/tmp_bin/grep
+        BeforeRun "export PATH='spec/tmp_bin'"
+        Data
+          #|
+        End
+        When run source ./php -v
+        The line 1 of stdout should eq "docker not installed"
+        The line 2 of stdout should eq "Docker.io is required"
+        The stderr should eq ""
+        rm -rf spec/tmp_bin
+    End
+    It "checks that docker.io is installed and do it"
+        # change the $PATH to a directory not containing 'docker'
+        mkdir -p spec/tmp_bin
+        ln -s -f "$(command -v dirname)" spec/tmp_bin/dirname
+        ln -s -f "$(command -v readlink)" spec/tmp_bin/readlink
+        ln -s -f "$(command -v grep)" spec/tmp_bin/grep
+        # do not add sudo to let the installation fail during tests
+        BeforeRun "export PATH='spec/tmp_bin'"
+        Data
+          #|y
+        End
+        When run source ./php -v
+        The line 1 of stdout should eq "docker not installed"
+        The line 2 of stdout should eq "sudo apt-get install docker.io"
+        The line 3 of stdout should eq "Unable to launch docker installation. Please do it manually."
+        The stderr should eq ""
+        rm -rf spec/tmp_bin
     End
     It "runs php in 5.6"
         When run source ./php 5.6 spec/phpversion.php
