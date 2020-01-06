@@ -11,7 +11,11 @@ before_install:
   - mkdir build; cd build; cmake ..; make -j4; sudo make install
   - cd ../..
   - docker pull jclaveau/php-multiversion:0.2.0
+  - sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash
 script:
   - sudo make
+  - sudo make uninstall
+  - sudo bpkg install -g jclaveau/docker-php-multiversion
+  - make check
 after_success:
   - bash <(curl -s https://codecov.io/bash) -s coverage;
