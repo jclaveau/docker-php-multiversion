@@ -4,7 +4,7 @@
   "scripts": ["php"],
   "license": "MIT",
   "files": [
-    "bin/shellspec",
+    "bin/php",
     "lib/functions.bash",
   ],
   "install": "make install"

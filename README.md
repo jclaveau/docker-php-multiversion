@@ -8,28 +8,35 @@ Use PHP in the version you prefer with nothing more than Docker installed (for d
 ```
 curl -fsSL https://raw.githubusercontent.com/jclaveau/docker-php-multiversion/master/installer.sh | sh
 ```
+Or with [bpkg/bpkg](https://github.com/bpkg/bpkg#bpkg---)
+```
+sudo bpkg install -g jclaveau/docker-php-multiversion
+```
 
 ## Usage
 ```shell
-$ php 7.1 spec/phpversion.php 
-$ 7.1 
-$ php 7.1 5.6 spec/phpversion.php 
-$ 7.1 
+$ php 7.1 spec/phpversion.php
+$ 7.1
+$ php 7.1 5.6 spec/phpversion.php
+$ 7.1
 $ 5.6
 ```
 If you installed PHP locally it's still available but only in the version you installed
 ```shell
-$ /usr/bin/php spec/phpversion.php 
+$ /usr/bin/php spec/phpversion.php
 ```
 
 
 This works also with `phpunit`
 ```shell
-$ php 7.1 vendor/bin/phpunit 
+$ php 7.1 vendor/bin/phpunit
 ```
-And with `composer` with a little more hacking i work on in my [PHP Library Development Toolkit](https://github.com/jclaveau/php-library-development-toolkit)
+and `composer`
+```shell
+$ php 7.1 /usr/bin/composer
+```
 
-You can also kill all running php-multiversion containers 
+You can also kill all running php-multiversion containers
 ```shell
 $ php kill-containers
 ```
