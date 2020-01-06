@@ -46,7 +46,7 @@ function run_docker() {
         fi
 
         if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.2.0'
+            docker_image_version='0.2.1'
         else
             docker_image_version=$PHP_MULTIVERSION_IMAGE
         fi

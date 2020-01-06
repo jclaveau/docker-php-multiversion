@@ -28,6 +28,13 @@ while :; do
         exit
     fi
 
+    if [ "$1" == 'container-exec' ]; then
+        shift
+        run_docker
+        exec_in_docker "$@"
+        exit
+    fi
+
     if awk -v version="$1" 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break
@@ -52,7 +59,7 @@ if in_docker_container; then
     do
         # In case php multiversion is run from ~/.local/bin calling "php -v"
         # will loop infinitelly so we force the next php to be found in /usr/bin
-        PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' "php$version" "$@"
+        /usr/bin/php"$version" "$@"
     done
 else
     run_docker

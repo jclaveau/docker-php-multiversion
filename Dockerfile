@@ -14,14 +14,17 @@ RUN ./install-tools-upgrade-repos.sh
 COPY install-php-packages.sh .
 RUN ./install-php-packages.sh
 
-RUN apt-get update
-RUN apt-get install composer -y
+RUN apt-get update && apt-get install composer -y
 RUN apt-get upgrade -y
 
-RUN apt-get -y --purge autoremove &&\
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/{man,doc}
-RUN apt-get update
+RUN apt-get install make &&\
+    sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash &&\
+    sudo bpkg install -g jclaveau/docker-php-multiversion
 
+RUN apt-get -y --purge autoremove &&\
+    apt-get clean &&\
+    rm -rf /tmp/* /var/tmp/* /usr/share/{man,doc} &&\
+    apt-get update
 
 # Xdebug CLI debugging
 # COPY files/xdebug /usr/bin/xdebug

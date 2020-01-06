@@ -44,6 +44,10 @@ Or the container of your current working dir
 ```shell
 $ php kill-container
 ```
+You can also exec whatever you want in container of your current working dir
+```shell
+$ php container-exec bash
+```
 
 ## PHP Versions
 This docker image provides all PHP versions available in [Ondřej Surý's PPA](https://github.com/oerdnj/deb.sury.org).
