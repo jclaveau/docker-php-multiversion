@@ -1,0 +1,11 @@
+{
+  "name": "docker-php-multiversion",
+  "description": "Runs PHP of the version you want in a Docker container",
+  "scripts": ["php"],
+  "license": "MIT",
+  "files": [
+    "bin/shellspec",
+    "lib/functions.bash",
+  ],
+  "install": "make install"
+}
