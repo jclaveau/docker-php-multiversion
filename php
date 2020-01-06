@@ -11,11 +11,20 @@ if ! in_docker_container; then
     # echo "in_docker_container"
 fi
 
+LIBRARY_DIR="$(pwd)"
+# shellcheck disable=SC2001
+CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+
 versions=()
 
 while :; do
     if [ "$1" == 'kill-containers' ]; then
         kill_containers
+        exit
+    fi
+
+    if [ "$1" == 'kill-container' ]; then
+        kill_container
         exit
     fi
 
@@ -46,7 +55,7 @@ if in_docker_container; then
         PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' "php$version" "$@"
     done
 else
-    run_docker "$(pwd)"
+    run_docker
 
     for version in "${versions[@]}";
     do

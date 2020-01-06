@@ -15,7 +15,9 @@ Describe "php"
         The stderr should eq ""
     End
     It "runs php in default version (default)"
-        run_docker $(pwd)
+        LIBRARY_DIR=$(pwd)
+        CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+        run_docker
         latest_version=$(latest_php_version)
 
         When run source ./php spec/phpversion.php
@@ -23,6 +25,8 @@ Describe "php"
         The stderr should eq ""
     End
     It "runs php in default version (latest)"
+        LIBRARY_DIR=$(pwd)
+        CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
         run_docker $(pwd)
         latest_version=$(latest_php_version)
 
@@ -67,6 +71,20 @@ Describe "php"
         The line 2 of stdout should not be blank
         # The line 3 of stdout should be blank
         The stderr should eq ""
+    End
+    It "runs multiple php containers and kill the one of pwd"
+        # clean the containers first
+        working_dir=$(pwd)
+        $working_dir/php kill-containers
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd ..
+        $working_dir/php 5.6 $working_dir/spec/phpversion.php
+        cd $working_dir
+        When run source $working_dir/php kill-container
+        The line 1 of stdout should not be blank # TODO pattern hexa
+        The line 2 of stdout should be blank
+        The stderr should eq ""
+        $working_dir/php kill-containers
     End
     It "runs php with environment variables"
         BeforeRun "export COMPOSER_VENDOR_DIR='custom_vendor'"

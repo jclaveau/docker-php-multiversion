@@ -34,10 +34,7 @@ function install_docker_if_missing() {
 }
 
 function run_docker() {
-    local LIBRARY_DIR lib_volume_option docker_image_version
-    LIBRARY_DIR=$1
-    # shellcheck disable=SC2001
-    CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+    local lib_volume_option docker_image_version
 
     if ! docker ps -a | grep -q "$CONTAINER_NAME$"
     then
@@ -106,10 +103,21 @@ function latest_php_version() {
 
 function kill_containers() {
     local container_ids
-    container_ids=$(docker ps --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^php-mv_.+/ { print $1}')
-    # echo $container_ids
+    container_ids=$(docker ps --no-trunc --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^php-mv_.+/ { print $1}')
 
     if [ -n "$container_ids" ]; then
+        # echo $container_ids
+        # shellcheck disable=SC2086
+        docker kill $container_ids
+    fi
+}
+
+function kill_container() {
+    local container_ids
+    container_ids=$(docker ps --no-trunc --format '{{.ID}} {{.Names}}' | awk "\$2 ~ /^$CONTAINER_NAME/ { print \$1}")
+
+    if [ -n "$container_ids" ]; then
+        # echo $container_ids
         # shellcheck disable=SC2086
         docker kill $container_ids
     fi

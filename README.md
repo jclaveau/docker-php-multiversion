@@ -40,6 +40,10 @@ You can also kill all running php-multiversion containers
 ```shell
 $ php kill-containers
 ```
+Or the container of your current working dir
+```shell
+$ php kill-container
+```
 
 ## PHP Versions
 This docker image provides all PHP versions available in [Ondřej Surý's PPA](https://github.com/oerdnj/deb.sury.org).
