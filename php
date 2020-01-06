@@ -28,6 +28,13 @@ while :; do
         exit
     fi
 
+    if [ "$1" == 'container-exec' ]; then
+        shift
+        run_docker
+        exec_in_docker "$@"
+        exit
+    fi
+
     if awk -v version="$1" 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break

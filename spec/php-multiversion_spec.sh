@@ -128,6 +128,11 @@ Describe "php"
         The stderr should eq ""
         rm -rf spec/tmp_bin
     End
+    It "runs php in 5.6 by using container-exec"
+        When run source ./php container-exec php 5.6 spec/phpversion.php
+        The stdout should eq "5.6"
+        The stderr should eq ""
+    End
     It "runs php in 5.6"
         When run source ./php 5.6 spec/phpversion.php
         The stdout should eq "5.6"
