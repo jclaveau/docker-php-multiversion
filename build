@@ -1,9 +1,9 @@
 #!/bin/bash
 
-docker image build \
+(docker image build \
     -t jclaveau/php-multiversion:latest \
-    .
-
+    . \
+     | tee build.stdout.log) 3>&1 1>&2 2>&3 | tee build.stderr.log
 
 php kill-containers
 
@@ -19,5 +19,8 @@ Push to Docker Hub with:
 
 docker image push jclaveau/php-multiversion:$PHP_MULTIVERSION_IMAGE
 
+docker images | grep jclaveau/php-multiversion
+docker tag <id> jclaveau/php-multiversion:X.X.X
+docker image push jclaveau/php-multiversion:X.X.X
 EOF
 fi

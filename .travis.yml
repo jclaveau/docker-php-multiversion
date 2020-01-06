@@ -11,7 +11,7 @@ before_install:
   - mkdir build; cd build; cmake ..; make -j4; sudo make install
   - cd ../..
   - git clone https://github.com/shellspec/shellspec.git
-  - docker pull jclaveau/php-multiversion:0.1.0
+  - docker pull jclaveau/php-multiversion:0.2.0
 script:
   - ./shellspec/shellspec
 after_success:

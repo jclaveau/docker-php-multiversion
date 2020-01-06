@@ -1,29 +1,12 @@
 #!/bin/bash
 
-apt-get update &&\
-    apt-get install --no-install-recommends --no-install-suggests -y \
-        ca-certificates\
-        software-properties-common\
-        curl \
-        git \
-        gnupg \
-        unzip \
-        nano \
-        htop \
-        nmap \
-        net-tools \
-        zip &&\
-
-add-apt-repository ppa:ondrej/php
-apt-get update
-
 versions=(5.6 7.0 7.1 7.2 7.3 7.4)
-# versions=(7.4)
+# versions=(5.6)
 for php_version in "${versions[@]}"
 do
     apt-get install -y \
-        php$php_version-fpm \
         php$php_version \
+        php$php_version-fpm \
         php$php_version-bcmath \
         php$php_version-cli \
         php$php_version-curl \
@@ -55,27 +38,18 @@ do
         php$php_version-ssh2 \
         php$php_version-stomp \
         php$php_version-uploadprogress \
-        php$php_version-uuid \
         php$php_version-opcache\
         php$php_version-zmq
 done
-
-# sebastian/global-state suggests installing ext-uopz (*) # https://github.com/oerdnj/deb.sury.org/issues/1269
-
 
 versions=(5.6 7.0 7.1)
 for php_version in "${versions[@]}"
 do
     apt-get install -y \
         php$php_version-mcrypt
-        
 done
 
-apt-get install --no-install-recommends --no-install-suggests -y \
+apt-get install -y \
     php-xdebug\
-    docker.io
-
-apt-get -y --purge autoremove &&\
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/{man,doc}
-
-apt-get update
+    php-uopz\
+    php-uuid

@@ -43,7 +43,7 @@ function run_docker() {
         fi
 
         if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.1.0'
+            docker_image_version='0.2.0'
         else
             docker_image_version=$PHP_MULTIVERSION_IMAGE
         fi
@@ -105,9 +105,8 @@ function latest_php_version() {
 }
 
 function kill_containers() {
-    container_ids=$(
-        docker ps --format '{{.ID}} {{.Image}}' | awk '$2 ~ /^jclaveau\/php-multiversion(:.+)?$/ { print $1}'
-    )
+    container_ids=$(docker ps --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^php-mv_.+/ { print $1}')
+    # echo $container_ids
 
     if [ -n "$container_ids" ]; then
         docker kill $container_ids
