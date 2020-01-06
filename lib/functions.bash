@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function in_docker_container() {
     # TODO check that the container is of jclaveau/php-multiversion
     if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup; then
@@ -8,6 +10,7 @@ function in_docker_container() {
 }
 
 function install_docker_if_missing() {
+    local docker_path docker_installed
     docker_path=$(command -v docker || echo "") # command -v docker fails under shellspec if PATH=""
     if [ -z "$docker_path" ]; then
         echo "docker not installed"
@@ -19,7 +22,7 @@ function install_docker_if_missing() {
             echo "sudo apt-get install docker.io"
 
             docker_installed=$(sudo apt-get install docker.io 2> /dev/null || (echo "failed"))
-            if [ $docker_installed == "failed" ]; then
+            if [ "$docker_installed" == "failed" ]; then
                 echo "Unable to launch docker installation. Please do it manually."
                 exit
             fi
@@ -31,10 +34,13 @@ function install_docker_if_missing() {
 }
 
 function run_docker() {
+    local LIBRARY_DIR lib_volume_option docker_image_version
     LIBRARY_DIR=$1
-    CONTAINER_NAME=php-mv'_'$(echo $LIBRARY_DIR | sed "s|[^[:alpha:].-]|_|g")
+    # shellcheck disable=SC2001
+    CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
 
-    if [ -z "$(docker ps -a | grep $CONTAINER_NAME$)" ]; then
+    if ! docker ps -a | grep -q "$CONTAINER_NAME$"
+    then
         # echo "Running new docker jclaveau/php-multiversion for $(pwd)"
         if [ "$HOME" != "$LIBRARY_DIR" ]; then
             lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR"
@@ -51,28 +57,29 @@ function run_docker() {
         docker run \
             -d \
             --rm \
-            --volume=$HOME:$HOME:ro \
-            --volume=$HOME/.composer:$HOME/.composer:rw \
+            --volume="$HOME":"$HOME":ro \
+            --volume="$HOME"/.composer:"$HOME"/.composer:rw \
             $lib_volume_option \
             --volume=/etc/group:/etc/group:ro \
             --volume=/etc/passwd:/etc/passwd:ro \
             --volume=/etc/shadow:/etc/shadow:ro \
             --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
-            --name $CONTAINER_NAME \
-            --workdir $LIBRARY_DIR \
-            jclaveau/php-multiversion:$docker_image_version > /dev/null
+            --name "$CONTAINER_NAME" \
+            --workdir "$LIBRARY_DIR" \
+            jclaveau/php-multiversion:"$docker_image_version" > /dev/null
     fi
 }
 
 function exec_in_docker() {
     # avoid https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
+    local USE_TTY printenv_array_length environment_vars value inline_env input_command_parts command
     test -t 1 && USE_TTY="-t"
 
     # Pass all environment variables to the container to mimic the development on the host
     readarray -t printenv_array <<< "$(printenv)"
     printenv_array_length=${#printenv_array[@]}
     environment_vars=()
-    for (( i=0; i<${printenv_array_length}+1; i++ ));
+    for (( i=0; i<printenv_array_length+1; i++ ));
     do
         if [[ ${printenv_array[i]} != "" ]]; then
             readarray -t parts <<< "$(sed '0,/=/s//\n/' <<< "${printenv_array[$i]}")" # split by first =
@@ -83,21 +90,14 @@ function exec_in_docker() {
         fi
     done
 
-    if [ ${#environment_vars[@]} == 0 ]; then
-        inline_env=''
-    else
-        inline_env=$(printf " --env %s" "${environment_vars[@]}")
-    fi
+    inline_env=$(printf " --env %s" "${environment_vars[@]}")
 
-    command="\
-        docker exec -i ${USE_TTY} \
-        --user $(id -u):$(id -g) \
-        $inline_env \
-        $CONTAINER_NAME $@"
+    input_command_parts=("$@")
+    command="docker exec -i ${USE_TTY} --user $(id -u):$(id -g) $inline_env $CONTAINER_NAME ${input_command_parts[*]}"
 
     # echo $command
     # echo ""
-    eval $command
+    eval "$command"
 }
 
 function latest_php_version() {
@@ -105,10 +105,12 @@ function latest_php_version() {
 }
 
 function kill_containers() {
+    local container_ids
     container_ids=$(docker ps --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^php-mv_.+/ { print $1}')
     # echo $container_ids
 
     if [ -n "$container_ids" ]; then
+        # shellcheck disable=SC2086
         docker kill $container_ids
     fi
 }

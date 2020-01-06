@@ -13,6 +13,7 @@ before_install:
   - docker pull jclaveau/php-multiversion:0.2.0
   - sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash
 script:
+  - shellcheck -x php lib/functions.bash
   - sudo make
   - sudo make uninstall
   - sudo bpkg install -g jclaveau/docker-php-multiversion

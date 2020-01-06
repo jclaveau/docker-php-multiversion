@@ -2,7 +2,8 @@
 
 script_dir=$(dirname "$(readlink -f "$0")")
 
-source $script_dir/lib/functions.bash
+# shellcheck source=lib/functions.bash
+source "$script_dir/lib/functions.bash"
 
 if ! in_docker_container; then
     install_docker_if_missing
@@ -13,20 +14,20 @@ fi
 versions=()
 
 while :; do
-    if [ $1 == 'kill-containers' ]; then
+    if [ "$1" == 'kill-containers' ]; then
         kill_containers
         exit
     fi
 
-    if awk -v version=$1 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
+    if awk -v version="$1" 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break
     fi
 
-    if awk -v version=$1 'BEGIN{ exit (version == 5.6 || version >= 7) }' ; then
+    if awk -v version="$1" 'BEGIN{ exit (version == 5.6 || version >= 7) }' ; then
         echo "Unsupported PHP version: $1"
     else
-        versions+=($1)
+        versions+=("$1")
     fi
 
     shift
@@ -42,13 +43,13 @@ if in_docker_container; then
     do
         # In case php multiversion is run from ~/.local/bin calling "php -v"
         # will loop infinitelly so we force the next php to be found in /usr/bin
-        PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' php$version "$@"
+        PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' "php$version" "$@"
     done
 else
-    run_docker $(pwd)
+    run_docker "$(pwd)"
 
     for version in "${versions[@]}";
     do
-        exec_in_docker php$version "$@"
+        exec_in_docker "php$version" "$@"
     done
 fi
