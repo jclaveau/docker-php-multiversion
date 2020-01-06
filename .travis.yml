@@ -10,9 +10,8 @@ before_install:
   - cd kcov
   - mkdir build; cd build; cmake ..; make -j4; sudo make install
   - cd ../..
-  - git clone https://github.com/shellspec/shellspec.git
   - docker pull jclaveau/php-multiversion:0.2.0
 script:
-  - ./shellspec/shellspec
+  - sudo make
 after_success:
   - bash <(curl -s https://codecov.io/bash) -s coverage;
