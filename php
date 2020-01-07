@@ -35,6 +35,11 @@ while :; do
         exit
     fi
 
+    if [ "$1" == 'config-container' ]; then
+        config_container
+        exit
+    fi
+
     if awk -v version="$1" 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break

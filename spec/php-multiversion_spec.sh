@@ -128,6 +128,34 @@ Describe "php"
         The stderr should eq ""
         rm -rf spec/tmp_bin
     End
+    It "configures ./etc directory"
+        BeforeRun 'rm -rf ./etc'
+        When run source ./php config-container
+        The stdout should match "*./etc/README.txt*"
+        The stdout should match "*./etc/php/apache2/custom-allversions-apache2-php.ini*"
+        The stdout should match "*./etc/php/fpm/custom-allversions-fpm-php.ini*"
+        The stdout should match "*./etc/php/cli/custom-allversions-cli-php.ini*"
+        The stderr should eq ""
+    End
+    It "adds file to container:/etc/php"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './php config-container'
+        BeforeRun './php kill-containers'
+        BeforeRun 'sleep 1'
+        When run source ./php container-exec ls /etc/php
+        The stdout should match "*apache2*"
+        The stdout should match "*cli*"
+        The stdout should match "*fpm*"
+        The stderr should eq ""
+    End
+    It "does not mount ./etc on /custom_etc if it's missing"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './php kill-containers > /dev/null'
+        When run source ./php container-exec ls /custom_etc
+        The status should eq 2
+        The stdout should eq ""
+        The stderr should eq "ls: cannot access '/custom_etc': No such file or directory"
+    End
     It "runs php in 5.6 by using container-exec"
         When run source ./php container-exec php 5.6 spec/phpversion.php
         The stdout should eq "5.6"

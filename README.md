@@ -49,6 +49,13 @@ You can also exec whatever you want in container of your current working dir
 $ php container-exec bash
 ```
 
+## Container configuration
+ + All the content of `<container>:/etc` would be overriden by the content of `<host>:<your project path>/etc`.
+ + Calling `php config-container` will prepare a `<container>:/etc` having the content `<container>:/etc_default`
+ + It contains empty files in `./etc/php` which are read after the loading of all PHP configurations, enabling you to change any option instantly.
+ + You can read the current config with `php 7.4 -i`
+ + You can access directly the current configuration value wth `php container-exec nano /etc/php/7.4/cli/php.ini` but it wouldn't persist after a container restart.
+
 ## PHP Versions
 This docker image provides all PHP versions available in [Ondřej Surý's PPA](https://github.com/oerdnj/deb.sury.org).
 
@@ -56,4 +63,4 @@ This docker image provides all PHP versions available in [Ondřej Surý's PPA](h
 For production purpose I recommend [jtreminio/php-docker](https://github.com/jtreminio/php-docker) image which provides a light image of PHP in any version of the same PPA.
 
 ## FPM
-My use case is presently centered around php-cli and I have a lot of work before matching my expectations but using it as a multiversion fpm provider could be interesting also later.
+My use case is presently centered around php-cli and I have a lot of work before matching my expectations but using it as a multiversion cli provider could be interesting also later.

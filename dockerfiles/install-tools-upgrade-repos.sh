@@ -8,6 +8,7 @@ apt-get upgrade
 apt-get install -y \
     ca-certificates\
     software-properties-common\
+    locate \
     curl \
     git \
     gnupg \

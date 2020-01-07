@@ -10,7 +10,7 @@ before_install:
   - cd kcov
   - mkdir build; cd build; cmake ..; make -j4; sudo make install
   - cd ../..
-  - docker pull jclaveau/php-multiversion:0.2.1
+  - docker pull jclaveau/php-multiversion:0.3.0
   - sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash
 script:
   - shellcheck -x php lib/functions.bash

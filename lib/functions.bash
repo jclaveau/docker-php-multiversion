@@ -45,25 +45,39 @@ function run_docker() {
             lib_volume_option=''
         fi
 
+        if [ -d "$LIBRARY_DIR/etc" ]; then
+            etc_volume_option="--volume=$LIBRARY_DIR/etc:/custom_etc"
+            # etc_volume_option=''
+        else
+            etc_volume_option=''
+        fi
+
         if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.2.1'
+            docker_image_version='0.3.0'
+            # docker_image_version='latest'
         else
             docker_image_version=$PHP_MULTIVERSION_IMAGE
         fi
 
-        docker run \
+        run_stdin=$( docker run \
             -d \
             --rm \
             --volume="$HOME":"$HOME":ro \
             --volume="$HOME"/.composer:"$HOME"/.composer:rw \
             $lib_volume_option \
+            $etc_volume_option \
             --volume=/etc/group:/etc/group:ro \
             --volume=/etc/passwd:/etc/passwd:ro \
             --volume=/etc/shadow:/etc/shadow:ro \
             --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
             --name "$CONTAINER_NAME" \
             --workdir "$LIBRARY_DIR" \
-            jclaveau/php-multiversion:"$docker_image_version" > /dev/null
+            jclaveau/php-multiversion:"$docker_image_version" /sbin/my_init \
+        )
+        # Forcing /sbin/my_init without redirection to /dev/null ensures
+        # the services and scripts are well run before a later container-exec
+
+        echo "$run_stdin" > /dev/null # comment for debug
     fi
 }
 
@@ -121,4 +135,19 @@ function kill_container() {
         # shellcheck disable=SC2086
         docker kill $container_ids
     fi
+}
+
+function config_container() {
+    local new_path
+
+    # copy the missing files from ./etc_default to ./etc
+    while IFS= read -r -d '' file
+    do
+        new_path=$(sed "s|etc_default|etc|g" <<< "$file")
+        mkdir -p "$(dirname "$new_path")"
+        if [ ! -f "$LIBRARY_DIR/$new_path" ]; then
+            echo "$new_path"
+            cp -n -r -p "$LIBRARY_DIR/$file" "$LIBRARY_DIR/$new_path"
+        fi
+    done <   <(find "./etc_default" -type "f" -print0)
 }
