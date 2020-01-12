@@ -114,6 +114,15 @@ Describe "php"
         The stdout should eq "COMPOSER_VENDOR_DIR=custom_vendor"
         The stderr should eq ""
     End
+    It "runs php changing the image version"
+        BeforeRun "./php kill-containers > /dev/null"
+        BeforeRun "export PHP_MULTIVERSION_IMAGE='latest'"
+        BeforeRun "./php spec/phpversion.php > /dev/null"
+        When run source ./php container --format {{.Image}}
+        The line 1 of stdout should match "*latest"
+        The line 2 of stdout should be blank
+        The stderr should eq ""
+    End
     It "checks that docker.io is installed and don't"
         # change the $PATH to a directory not containing 'docker'
         mkdir -p spec/tmp_bin
