@@ -156,6 +156,15 @@ Describe "php"
         The stdout should eq ""
         The stderr should eq "ls: cannot access '/custom_etc': No such file or directory"
     End
+    It "runs php in 5.6 from $HOME"
+        # avoid duplicate mounted volume between $HOME and $libdir
+        libdir=$(pwd)
+        cd $HOME
+        When run source "$libdir"/php 5.6 "$libdir"/spec/phpversion.php
+        The stdout should eq "5.6"
+        The stderr should eq ""
+        # cd libdir
+    End
     It "runs php in 5.6 by using container-exec"
         When run source ./php container-exec php 5.6 spec/phpversion.php
         The stdout should eq "5.6"
