@@ -151,3 +151,11 @@ function config_container() {
         fi
     done <   <(find "./etc_default" -type "f" -print0)
 }
+
+function ps_container() {
+    docker ps --filter name="$CONTAINER_NAME" --filter volume="$LIBRARY_DIR" "$@"
+}
+
+function ps_containers() {
+    docker ps --filter "name=php-mv_" "$@"
+}

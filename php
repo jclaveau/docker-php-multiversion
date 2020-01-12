@@ -40,6 +40,18 @@ while :; do
         exit
     fi
 
+    if [ "$1" == 'container' ]; then
+        shift
+        ps_container "$@"
+        exit
+    fi
+
+    if [ "$1" == 'containers' ]; then
+        shift
+        ps_containers "$@"
+        exit
+    fi
+
     if awk -v version="$1" 'BEGIN{ exit (version ~ /^[0-9]+.[0-9]+$/) }' ; then
         # not a version
         break

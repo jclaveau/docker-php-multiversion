@@ -36,15 +36,17 @@ and `composer`
 $ php 7.1 /usr/bin/composer
 ```
 
-You can also kill all running php-multiversion containers
+You can list php-multiversion containers ([Supporting all options of docker ps](https://docs.docker.com/engine/reference/commandline/ps/))
 ```shell
-$ php kill-containers
+$ php containers # all running containers
+$ php container  # container attached to the current directory
 ```
-Or the container of your current working dir
+You can kill containers
 ```shell
-$ php kill-container
+$ php kill-containers # all running containers
+$ php kill-container  # container attached to the current directory
 ```
-You can also exec whatever you want in container of your current working dir
+You can also exec whatever you want in the container attached to your current working dir
 ```shell
 $ php container-exec bash
 ```

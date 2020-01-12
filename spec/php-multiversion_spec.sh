@@ -86,6 +86,26 @@ Describe "php"
         The stderr should eq ""
         $working_dir/php kill-containers
     End
+    It "lists container"
+        BeforeRun './php -v > /dev/null'
+        When run ./php container --format {{.Names}}
+        The line 1 of stdout should match "php-mv_*_docker-php-multiversion"
+        The line 2 of stdout should be blank
+        The stderr should eq ""
+    End
+    It "lists containers"
+        BeforeRun "./php kill-containers > /dev/null"
+        BeforeRun './php -v > /dev/null'
+        BeforeRun 'mkdir -p tmp'
+        BeforeRun 'cd tmp'
+        BeforeRun '../php -v > /dev/null'
+        BeforeRun 'cd ..'
+        When run ./php containers --format {{.Names}}
+        The line 1 of stdout should match "php-mv_*_docker-php-multiversion_tmp"
+        The line 2 of stdout should match "php-mv_*_docker-php-multiversion"
+        The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
     It "runs php with environment variables"
         BeforeRun "export COMPOSER_VENDOR_DIR='custom_vendor'"
         # export is required until inline environment variables are supported by Shellspec
