@@ -106,6 +106,17 @@ Describe "php"
         The line 3 of stdout should be blank
         The stderr should eq ""
     End
+    It "reruns a container"
+        ./php kill-containers > /dev/null
+        ./php -v > /dev/null
+        container_id_before="$(./php container --no-trunc --format {{.ID}})" # cannot use BeforeRun here
+        When run ./php rerun-container
+        The line 1 of stdout should eq "$container_id_before"
+        container_id_after="$(./php container --no-trunc --format {{.ID}})"
+        The line 2 of stdout should eq "$container_id_after"
+        The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
     It "runs php with environment variables"
         BeforeRun "export COMPOSER_VENDOR_DIR='custom_vendor'"
         # export is required until inline environment variables are supported by Shellspec

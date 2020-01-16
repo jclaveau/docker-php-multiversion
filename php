@@ -28,6 +28,14 @@ while :; do
         exit
     fi
 
+    if [ "$1" == 'rerun-container' ]; then
+        shift
+        kill_container
+        run_docker
+        ps_container --no-trunc --format "{{.ID}}"
+        exit
+    fi
+
     if [ "$1" == 'container-exec' ]; then
         shift
         run_docker
