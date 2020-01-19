@@ -5,19 +5,21 @@ LIBDIR := $(PREFIX)/lib
 
 .PHONY: all
 all:
-	make test
+	# make test
 	make install
-	make check
 
 .PHONY: install
 install:
+	install -D stub/php $(BINDIR)/$(BIN)
 	install -d $(LIBDIR)/$(BIN)
 	cp -r php lib $(LIBDIR)/$(BIN)
-	install -D stub/php $(BINDIR)/$(BIN)
+	mkdir -p $(PREFIX)/share/bash-competion/completions/
+	cp -r ./share $(PREFIX)/share
 
 .PHONY: uninstall
 uninstall:
 	rm -rf $(LIBDIR)/$(BIN) $(BINDIR)/$(BIN)
+	rm $(PREFIX)/share/bash-competion/completions/php.bash
 
 # package:
 	# contrib/make_package_json.sh > package.json
@@ -30,12 +32,6 @@ uninstall:
 .PHONY: test
 test:
 	if [ ! -d 'shellspec' ]; then git clone https://github.com/shellspec/shellspec.git; fi
-	./shellspec/shellspec
+	./shellspec/shellspec --fail-fast
 
 .PHONY: check
-check:
-	# CHECKING PHP 5.6
-	php 5.6 -v
-	# CHECKING PHP 7.4
-	php 7.4 -v
-	# EVERYTHING IS GOOD!

@@ -12,12 +12,15 @@ before_install:
   - cd ../..
   - docker pull jclaveau/php-multiversion:0.3.0
   - docker pull jclaveau/php-multiversion:latest
-  - sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash
+  - curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
+  - echo $PATH
+  - PATH=/home/travis/.local/bin:$PATH
 script:
   - shellcheck -x php lib/functions.bash
-  - sudo make
-  - sudo make uninstall
-  - sudo bpkg install -g jclaveau/docker-php-multiversion
-  - make check
+  - bpkg install -g jclaveau/docker-php-multiversion
+  - . ~/.profile
+  - command -v php
+  - git clone https://github.com/shellspec/shellspec.git
+  - make test
 after_success:
   - bash <(curl -s https://codecov.io/bash) -s coverage;

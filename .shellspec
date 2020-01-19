@@ -1,3 +1,5 @@
 --require spec_helper
---shell bash --kcov
+--shell bash
+--kcov
 --kcov-common-options "--include-pattern=$(pwd)/php,$(pwd)/lib/"
+# !! not using kcov produces errors due to shellspec

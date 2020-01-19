@@ -240,4 +240,57 @@ Describe "php"
         The line 1 of stdout should eq "7.4"
         The stderr should eq ""
     End
+
+    
+    It "completes command line: php only"
+        complete_suggestions() {
+                source $(pwd)/share/bash-completion/completions/php.bash
+                # source ./share/bash-completion/completions/php.bash
+                export COMP_LINE="php"
+                export COMP_WORDS=(php)
+                export COMP_CWORD=1
+                export COMP_POINT=3
+                
+                complete_command=$(complete -p | sed "s/.*-F \\([^ ]*\\) .*/\\1/")
+                eval "$complete_command"
+                echo "${COMPREPLY[@]}"
+        }
+        When call complete_suggestions
+        The stdout should eq "containers container kill-containers kill-container rerun-container config-container container-exec 5.6 7.0 7.1 7.2 7.3 7.4"
+        The stderr should eq ""
+    End
+
+    It "completes command line: php co"
+        complete_suggestions() {
+                source $(pwd)/share/bash-completion/completions/php.bash
+                export COMP_LINE="php co"
+                export COMP_WORDS=(php co)
+                export COMP_CWORD=2
+                export COMP_POINT=5
+                
+                complete_command=$(complete -p | sed "s/.*-F \\([^ ]*\\) .*/\\1/")
+                eval "$complete_command"
+                echo "${COMPREPLY[@]}"
+        }
+        When call complete_suggestions
+        The stdout should eq "containers container config-container container-exec"
+        The stderr should eq ""
+    End
+
+    It "completes command line: php kil"
+        complete_suggestions() {
+                source $(pwd)/share/bash-completion/completions/php.bash
+                export COMP_LINE="php kil"
+                export COMP_WORDS=(php kil)
+                export COMP_CWORD=2
+                export COMP_POINT=6
+                
+                complete_command=$(complete -p | sed "s/.*-F \\([^ ]*\\) .*/\\1/")
+                eval "$complete_command"
+                echo "${COMPREPLY[@]}"
+        }
+        When call complete_suggestions
+        The stdout should eq "kill-containers kill-container"
+        The stderr should eq ""
+    End
 End

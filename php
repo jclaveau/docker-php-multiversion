@@ -18,6 +18,58 @@ CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
 versions=()
 
 while :; do
+    if [ "$1" == 'commands' ]; then
+        shift
+        # echo "commands => $@"
+        propositions=()
+        
+        if [ "$2" != "containers" ]
+        then
+            propositions+=("containers")
+            propositions+=("container")
+        fi
+
+        if [ "$2" != "kill-containers" ]
+        then
+            propositions+=("kill-containers")
+            propositions+=("kill-container")
+        fi
+
+        ends=(rerun-container config-container container-exec)
+        for i in "${ends[@]}"
+        do
+            if [ "$2" != "$i" ]
+            then
+                propositions+=("$i")
+            fi
+        done
+
+        versions=(5.6 7.0 7.1 7.2 7.3 7.4)
+        for version in "${versions[@]}"
+        do
+            skip=
+            for j in "$@"; do
+                if [[ "$version" == "$j" ]]; then
+                    skip=1;
+                    break;
+                fi
+            done
+            
+            [[ -n $skip ]] || propositions+=("$version")
+        done
+
+        # for file in $(ls)
+        # do
+            # propositions+=(./"$file")
+        # done
+        
+        for i in "${propositions[@]}"; do
+            echo "$i"
+        done
+        
+        exit
+    fi
+
     if [ "$1" == 'kill-containers' ]; then
         kill_containers
         exit
