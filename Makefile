@@ -2,6 +2,7 @@ BIN ?= php
 PREFIX ?= /usr/local
 BINDIR := $(PREFIX)/bin
 LIBDIR := $(PREFIX)/lib
+SHELL:=/bin/bash
 
 .PHONY: all
 all:
@@ -10,11 +11,10 @@ all:
 
 .PHONY: install
 install:
-	install -D stub/php $(BINDIR)/$(BIN)
-	install -d $(LIBDIR)/$(BIN)
-	cp -r php lib $(LIBDIR)/$(BIN)
-	mkdir -p $(PREFIX)/share/bash-competion/completions/
-	cp -r ./share $(PREFIX)/share
+	cp -v -f -r ./* $(PREFIX)/lib/php
+	ln -v -f -s $(PREFIX)/lib/php/bin/php $(PREFIX)/bin/php
+	ln -v -f -s $(PREFIX)/lib/php/share/bash-completion/completions/php.bash \
+				$(PREFIX)/share/bash-completion/completions/php.bash
 
 .PHONY: uninstall
 uninstall:
@@ -29,9 +29,5 @@ uninstall:
 	# seq2gif -l 5000 -h 32 -w 139 -p win -i ttyrecord -o docs/demo.gif
 	# gifsicle -i docs/demo.gif -O3 -o docs/demo.gif
 
-.PHONY: test
 test:
-	if [ ! -d 'shellspec' ]; then git clone https://github.com/shellspec/shellspec.git; fi
-	./shellspec/shellspec --fail-fast
-
-.PHONY: check
+	contrib/test.sh

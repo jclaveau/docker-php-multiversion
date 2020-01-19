@@ -16,7 +16,7 @@ before_install:
   - echo $PATH
   - PATH=/home/travis/.local/bin:$PATH
 script:
-  - shellcheck -x php lib/functions.bash
+  - shellcheck -x bin/* lib/*
   - bpkg install -g jclaveau/docker-php-multiversion
   - . ~/.profile
   - command -v php
