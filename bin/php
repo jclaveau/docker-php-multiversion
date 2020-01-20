@@ -6,7 +6,6 @@ if [ -d "$script_dir"/bin ]; then
     script_dir="$script_dir"/bin
 fi
 
-# echo "script_dir: $script_dir"
 # shellcheck source=lib/functions.bash
 source "$script_dir/../lib/functions.bash"
 

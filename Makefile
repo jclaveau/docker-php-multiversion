@@ -16,6 +16,12 @@ install:
 	ln -v -f -s $(PREFIX)/lib/php/share/bash-completion/completions/php.bash \
 				$(PREFIX)/share/bash-completion/completions/php.bash
 
+.PHONY: install-dev
+install-dev:
+	ln -v -f -s $(shell pwd)/bin/php $(PREFIX)/bin/php
+	ln -v -f -s $(PREFIX)/share/bash-completion/completions/php.bash \
+				$(shell pwd)/share/bash-completion/completions/php.bash
+
 .PHONY: uninstall
 uninstall:
 	rm -rf $(LIBDIR)/$(BIN) $(BINDIR)/$(BIN)
