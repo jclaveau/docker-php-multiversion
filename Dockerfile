@@ -23,10 +23,12 @@ RUN apt-get install make  &&\
 
 # syncing configuration
 COPY dockerfiles/lsyncd.conf /etc/lsyncd.conf
-COPY dockerfiles/lsyncd.sh /etc/my_init.d/lsyncd.sh
+COPY dockerfiles/sync_etc.sh /etc/my_init.d/sync_etc.sh
+COPY dockerfiles/sync_log.sh /etc/my_init.d/sync_log.sh
 RUN apt-get install lsyncd -y \
     && mkdir -p /etc/my_init.d \
-    && chmod +x /etc/my_init.d/lsyncd.sh
+    && chmod +x /etc/my_init.d/sync_etc.sh \
+    && chmod +x /etc/my_init.d/sync_log.sh
 
 RUN apt-get -y --purge autoremove &&\
     apt-get clean &&\

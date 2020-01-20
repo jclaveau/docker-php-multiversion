@@ -10,7 +10,7 @@ if [ ! -d '/tmp/shellspec' ]; then
 fi
 # cd $(dirname $(command -v php))
 # pwd
-/tmp/shellspec/shellspec --fail-fast
+/tmp/shellspec/shellspec
 # /tmp/shellspec/shellspec --focus
 
 # export PATH=$saved_path

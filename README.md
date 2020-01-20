@@ -53,6 +53,11 @@ You can also exec whatever you want in the container attached to your current wo
 $ php container-exec bash
 ```
 
+## Logging
+ + If you create à `host:./log` folder, all the content of `container:/var/log` will be placed inside in realtime.
+ + A call to `php rerun-container` is required if the `host:./log` folder is created after the container is run.
+ + The user who run the container always owns all the content of  `host:./log`.
+
 ## Container configuration
  + All the content of `<container>:/etc` would be overriden by the content of `<host>:<your project path>/etc`.
  + Calling `php config-container` will prepare a `<container>:/etc` having the content `<container>:/etc_default`
