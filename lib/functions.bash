@@ -45,15 +45,20 @@ function run_docker() {
             lib_volume_option=''
         fi
 
+        if [ -d "$LIBRARY_DIR/log" ]; then
+            log_volume_option="--volume=$LIBRARY_DIR/log:/host_log"
+        else
+            log_volume_option=''
+        fi
+
         if [ -d "$LIBRARY_DIR/etc" ]; then
             etc_volume_option="--volume=$LIBRARY_DIR/etc:/custom_etc"
-            # etc_volume_option=''
         else
             etc_volume_option=''
         fi
 
         if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.3.0'
+            docker_image_version='0.4.0'
             # docker_image_version='latest'
         else
             docker_image_version=$PHP_MULTIVERSION_IMAGE
@@ -66,12 +71,14 @@ function run_docker() {
             --volume="$HOME"/.composer:"$HOME"/.composer:rw \
             $lib_volume_option \
             $etc_volume_option \
+            $log_volume_option \
             --volume=/etc/group:/etc/group:ro \
             --volume=/etc/passwd:/etc/passwd:ro \
             --volume=/etc/shadow:/etc/shadow:ro \
             --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
             --name "$CONTAINER_NAME" \
             --workdir "$LIBRARY_DIR" \
+            --env PHPMV_RUNNING_USER="$USER" \
             jclaveau/php-multiversion:"$docker_image_version" /sbin/my_init \
         )
         # Forcing /sbin/my_init without redirection to /dev/null ensures

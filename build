@@ -19,8 +19,11 @@ Push to Docker Hub with:
 
 docker image push jclaveau/php-multiversion:$PHP_MULTIVERSION_IMAGE
 
-docker images | grep jclaveau/php-multiversion
-docker tag <id> jclaveau/php-multiversion:X.X.X
-docker image push jclaveau/php-multiversion:X.X.X
 EOF
+
+image_id=$(docker images --filter "reference=jclaveau/php-multiversion:latest" --format {{.ID}})
+
+echo "docker tag $image_id jclaveau/php-multiversion:X.X.X"
+echo "docker image push jclaveau/php-multiversion:X.X.X"
+
 fi

@@ -191,6 +191,7 @@ Describe "php"
         The stdout should match "*fpm*"
         The stderr should eq ""
     End
+    
     It "does not mount ./etc on /custom_etc if it's missing"
         BeforeRun 'rm -rf ./etc'
         BeforeRun './bin/php kill-containers > /dev/null'
@@ -199,6 +200,33 @@ Describe "php"
         The stdout should eq ""
         The stderr should eq "ls: cannot access '/custom_etc': No such file or directory"
     End
+
+    It "does not mount ./log on /host_log if it's missing"
+        BeforeRun 'rm -rf ./log &> /dev/null'
+        BeforeRun './bin/php kill-containers > /dev/null'
+        When run source ./bin/php container-exec ls /host_log
+        The status should eq 2
+        The stdout should eq ""
+        The stderr should eq "ls: cannot access '/host_log': No such file or directory"
+    End
+    
+    It "writes logs to container:/log"
+        check_syslog_owned_by_user() {
+            ./bin/php kill-containers > /dev/null
+            rm -rf ./log/*
+            mkdir -p ./log
+            ./bin/php -v > /dev/null
+            sleep 1
+            ls ./log/syslog
+            stat -c '%U' ./log/syslog
+        }
+        When call check_syslog_owned_by_user
+        The line 1 of stdout should match "./log/syslog"
+        The line 2 of stdout should match "$USER"
+        The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
+
     It "runs php in 5.6 from $HOME"
         # avoid duplicate mounted volume between $HOME and $libdir
         libdir=$(pwd)
