@@ -279,6 +279,24 @@ Describe "php"
         The line 2 of stderr should eq " [ ? ]  ubuntu-fan"
     End
     
+    It " starts php builtin webserver services"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './bin/php rerun-container'
+        BeforeRun 'sleep 2'
+        list_webserver_services() {
+            ./bin/php container-exec ps --sort cmd -u "$USER" | grep -E 'php'
+        }
+        When call list_webserver_services
+        The word 4 of line 1 of stdout should eq "php5.6"
+        The word 4 of line 2 of stdout should eq "php7.0"
+        The word 4 of line 3 of stdout should eq "php7.1"
+        The word 4 of line 4 of stdout should eq "php7.2"
+        The word 4 of line 5 of stdout should eq "php7.3"
+        The word 4 of line 6 of stdout should eq "php7.4"
+        The line 7 of stdout should be blank
+        The stderr should be blank
+    End
+    
     It "runs php in 5.6 from $HOME"
         # avoid duplicate mounted volume between $HOME and $libdir
         libdir=$(pwd)

@@ -27,7 +27,14 @@ COPY dockerfiles/etc/lsyncd.conf /etc/lsyncd.conf
 COPY dockerfiles/etc/my_init.d/20-sync_log.sh /etc/my_init.d/20-sync_log.sh
 COPY dockerfiles/etc/my_init.d/30-sync_etc.sh /etc/my_init.d/30-sync_etc.sh
 COPY dockerfiles/etc/my_init.d/99-start_services.sh /etc/my_init.d/99-start_services.sh
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_5-6/run
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-0/run
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-1/run
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-2/run
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-3/run
+COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-4/run
 COPY dockerfiles/etc/service/chown_log/chown_log_run.sh /etc/service/chown_log/run
+
 RUN apt-get install lsyncd -y \
     && chmod +x -R /etc/my_init.d/* \
     && chmod +x -R /etc/service/*

@@ -58,7 +58,7 @@ function run_docker() {
         fi
 
         if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.5.1'
+            docker_image_version='0.5.2'
             # docker_image_version='latest'
         else
             docker_image_version=$PHP_MULTIVERSION_IMAGE
@@ -79,6 +79,7 @@ function run_docker() {
             --name "$CONTAINER_NAME" \
             --workdir "$LIBRARY_DIR" \
             --env PHPMV_RUNNING_USER="$USER" \
+            --env PHPMV_WORKDIR="$LIBRARY_DIR" \
             jclaveau/php-multiversion:"$docker_image_version" /sbin/my_init \
         )
         # Forcing /sbin/my_init without redirection to /dev/null ensures
