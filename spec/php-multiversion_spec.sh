@@ -50,7 +50,7 @@ Describe "php"
         The stdout should eq "5.6"
         The stderr should eq ""
     End
-    fIt "runs multiple php containers and rerun the first one without conflict"
+    It "runs multiple php containers and rerun the first one without conflict"
         # https://github.com/jclaveau/docker-php-multiversion/issues/16
         working_dir=$(pwd)
         $working_dir/bin/php 5.6 $working_dir/spec/phpversion.php
@@ -118,6 +118,12 @@ Describe "php"
         container_id_after="$(./bin/php container --no-trunc --format {{.ID}})"
         The line 2 of stdout should eq "$container_id_after"
         The line 3 of stdout should be blank
+        The stderr should eq ""
+    End
+    It "runs container-ip"
+        ./bin/php kill-container > /dev/null
+        When run ./bin/php container-ip
+        The stdout should match "*.*.*.*"
         The stderr should eq ""
     End
     It "runs php with environment variables"
@@ -309,7 +315,7 @@ Describe "php"
                 echo "${COMPREPLY[@]}"
         }
         When call complete_suggestions
-        The stdout should eq "containers container kill-containers kill-container rerun-container config-container container-exec 5.6 7.0 7.1 7.2 7.3 7.4"
+        The stdout should eq "containers container kill-containers kill-container rerun-container config-container container-exec container-ip 5.6 7.0 7.1 7.2 7.3 7.4"
         The stderr should eq ""
     End
 
@@ -327,7 +333,7 @@ Describe "php"
                 echo "${COMPREPLY[@]}"
         }
         When call complete_suggestions
-        The stdout should eq "containers container config-container container-exec"
+        The stdout should eq "containers container config-container container-exec container-ip"
         The stderr should eq ""
     End
 

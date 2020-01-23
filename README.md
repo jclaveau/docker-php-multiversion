@@ -53,6 +53,11 @@ You can also exec whatever you want in the container attached to your current wo
 $ php container-exec bash
 ```
 
+Get the IP of your container
+```shell
+$ php container-ip
+```
+
 ## Logging
  + If you create à `host:./log` folder, all the content of `container:/var/log` will be placed inside in realtime.
  + A call to `php rerun-container` is required if the `host:./log` folder is created after the container is run.

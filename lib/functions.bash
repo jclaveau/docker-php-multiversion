@@ -166,3 +166,11 @@ function ps_container() {
 function ps_containers() {
     docker ps --filter "name=php-mv_" "$@"
 }
+
+function container_id() {
+    ps_container --format '{{.ID}}'
+}
+
+function container_ip() {
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$(container_id)"
+}

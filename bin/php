@@ -39,7 +39,7 @@ while :; do
             propositions+=("kill-container")
         fi
 
-        ends=(rerun-container config-container container-exec)
+        ends=(rerun-container config-container container-exec container-ip)
         for i in "${ends[@]}"
         do
             if [ "$2" != "$i" ]
@@ -96,6 +96,12 @@ while :; do
         shift
         run_docker
         exec_in_docker "$@"
+        exit
+    fi
+
+    if [ "$1" == 'container-ip' ]; then
+        run_docker
+        container_ip
         exit
     fi
 
