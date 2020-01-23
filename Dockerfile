@@ -27,10 +27,10 @@ COPY dockerfiles/etc/lsyncd.conf /etc/lsyncd.conf
 COPY dockerfiles/etc/my_init.d/20-sync_log.sh /etc/my_init.d/20-sync_log.sh
 COPY dockerfiles/etc/my_init.d/30-sync_etc.sh /etc/my_init.d/30-sync_etc.sh
 COPY dockerfiles/etc/my_init.d/99-start_services.sh /etc/my_init.d/99-start_services.sh
-COPY dockerfiles/etc/service/chown_log/chown_log_run.sh /etc/service/chown_log/run.sh
+COPY dockerfiles/etc/service/chown_log/chown_log_run.sh /etc/service/chown_log/run
 RUN apt-get install lsyncd -y \
-    && chmod +x /etc/my_init.d/* \
-    && chmod +x /etc/service/*
+    && chmod +x -R /etc/my_init.d/* \
+    && chmod +x -R /etc/service/*
 
 RUN apt-get -y --purge autoremove &&\
     apt-get clean &&\
