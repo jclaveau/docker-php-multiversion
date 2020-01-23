@@ -171,6 +171,7 @@ Describe "php"
         The stderr should eq ""
         rm -rf spec/tmp_bin
     End
+    
     It "configures ./etc directory"
         BeforeRun 'rm -rf ./etc'
         When run source ./bin/php config-container
@@ -180,6 +181,7 @@ Describe "php"
         The stdout should match "*./etc/php/cli/custom-allversions-cli-php.ini*"
         The stderr should eq ""
     End
+    
     It "adds file to container:/etc/php"
         BeforeRun 'rm -rf ./etc'
         BeforeRun './bin/php config-container'
@@ -202,7 +204,7 @@ Describe "php"
     End
 
     It "does not mount ./log on /host_log if it's missing"
-        BeforeRun 'rm -rf ./log &> /dev/null'
+        BeforeRun 'rm -rf ./log 2>&1 >/dev/null'
         BeforeRun './bin/php kill-containers > /dev/null'
         When run source ./bin/php container-exec ls /host_log
         The status should eq 2
@@ -227,6 +229,26 @@ Describe "php"
         The stderr should eq ""
     End
 
+    It " starts httpd services"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './bin/php rerun-container'
+        BeforeRun 'sleep 2'
+        list_httpd_services() {
+            ./bin/php container-exec service --status-all | grep -E 'apache2|nginx|php'
+        }
+        When call list_httpd_services
+        The line 1 of stdout should eq " [ + ]  apache2"
+        The line 2 of stdout should eq " [ + ]  nginx"
+        The line 3 of stdout should eq " [ + ]  php5.6-fpm"
+        The line 4 of stdout should eq " [ + ]  php7.0-fpm"
+        The line 5 of stdout should eq " [ + ]  php7.1-fpm"
+        The line 6 of stdout should eq " [ + ]  php7.2-fpm"
+        The line 7 of stdout should eq " [ + ]  php7.3-fpm"
+        The line 8 of stdout should eq " [ + ]  php7.4-fpm"
+        The line 1 of stderr should eq " [ ? ]  hwclock.sh"
+        The line 2 of stderr should eq " [ ? ]  ubuntu-fan"
+    End
+    
     It "runs php in 5.6 from $HOME"
         # avoid duplicate mounted volume between $HOME and $libdir
         libdir=$(pwd)

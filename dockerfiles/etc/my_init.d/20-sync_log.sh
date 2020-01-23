@@ -1,4 +1,5 @@
 #!/bin/bash
+# See: /etc/service/chown_log.sh
 
 if [ -d "/host_log/" ]; then
     # copy everything from log to host_log
@@ -6,11 +7,5 @@ if [ -d "/host_log/" ]; then
     # replace log folder by a symlink
     mv /var/log /var/log.bak
     ln -s -v /host_log /var/log
-
-    # loop of chown
-    while true
-    do
-        sudo chown -R $PHPMV_RUNNING_USER: /host_log/*
-        sleep 1
-    done
+    chown -R $PHPMV_RUNNING_USER: /host_log/*
 fi
