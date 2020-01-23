@@ -120,12 +120,36 @@ Describe "php"
         The line 3 of stdout should be blank
         The stderr should eq ""
     End
+    
     It "runs container-ip"
         ./bin/php kill-container > /dev/null
         When run ./bin/php container-ip
         The stdout should match "*.*.*.*"
         The stderr should eq ""
     End
+    
+    It "runs container-logs"
+        ./bin/php kill-container > /dev/null
+        When run ./bin/php container-logs
+        The line 1 of stdout should match '*syslog-ng*'
+        The line 1 of stdout should match '*starting*'
+        The line 1 of stderr should eq "*** Running /etc/my_init.d/00_regen_ssh_host_keys.sh..."
+        The line 2 of stderr should eq "*** Running /etc/my_init.d/10_syslog-ng.init..."
+    End
+    
+    It "runs container-logs with options"
+        BeforeRun "./bin/php kill-container > /dev/null"
+        BeforeRun "php rerun-container > /dev/null"
+        BeforeRun "sleep 3"
+        When run ./bin/php container-logs --tail=4
+        The line 1 of stdout should not be blank
+        The line 2 of stdout should not be blank
+        The line 3 of stdout should be blank
+        The line 1 of stderr should eq '*** Booting runit daemon...'
+        The line 2 of stderr should match '*started*'
+        The line 3 of stderr should be blank
+    End
+    
     It "runs php with environment variables"
         BeforeRun "export COMPOSER_VENDOR_DIR='custom_vendor'"
         # export is required until inline environment variables are supported by Shellspec
@@ -315,7 +339,7 @@ Describe "php"
                 echo "${COMPREPLY[@]}"
         }
         When call complete_suggestions
-        The stdout should eq "containers container kill-containers kill-container rerun-container config-container container-exec container-ip 5.6 7.0 7.1 7.2 7.3 7.4"
+        The stdout should eq "containers container kill-containers kill-container rerun-container config-container container-exec container-ip container-logs 5.6 7.0 7.1 7.2 7.3 7.4"
         The stderr should eq ""
     End
 
@@ -333,7 +357,7 @@ Describe "php"
                 echo "${COMPREPLY[@]}"
         }
         When call complete_suggestions
-        The stdout should eq "containers container config-container container-exec container-ip"
+        The stdout should eq "containers container config-container container-exec container-ip container-logs"
         The stderr should eq ""
     End
 

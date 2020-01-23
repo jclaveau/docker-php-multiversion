@@ -174,3 +174,7 @@ function container_id() {
 function container_ip() {
     docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$(container_id)"
 }
+
+function container_logs() {
+    docker logs "$(container_id)" "$@"
+}
