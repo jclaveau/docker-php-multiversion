@@ -284,6 +284,34 @@ Describe "php"
         The stderr should be blank
     End
     
+    It "serves php of the right version with apache2, nginx, php builtin webserver"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './bin/php rerun-container > /dev/null'
+        BeforeRun 'sleep 2'
+        serves_vhosts_with_the_expected_php_version() {
+            ip_address="$(./bin/php container-ip)"
+            curl --silent http://"$ip_address":8000/spec/phpversion.php
+            curl --silent http://"$ip_address":8010/spec/phpversion.php
+            curl --silent http://"$ip_address":8056/spec/phpversion.php
+            curl --silent http://"$ip_address":8070/spec/phpversion.php
+            curl --silent http://"$ip_address":8071/spec/phpversion.php
+            curl --silent http://"$ip_address":8072/spec/phpversion.php
+            curl --silent http://"$ip_address":8073/spec/phpversion.php
+            curl --silent http://"$ip_address":8074/spec/phpversion.php
+        }
+        When call serves_vhosts_with_the_expected_php_version
+        The line 1 of stdout should eq "7.4"
+        The line 2 of stdout should eq "7.4"
+        The line 3 of stdout should eq "5.6"
+        The line 4 of stdout should eq "7.0"
+        The line 5 of stdout should eq "7.1"
+        The line 6 of stdout should eq "7.2"
+        The line 7 of stdout should eq "7.3"
+        The line 8 of stdout should eq "7.4"
+        The line 9 of stdout should be blank
+        The stderr should be blank
+    End
+    
     It "runs php in 5.6 from $HOME"
         # avoid duplicate mounted volume between $HOME and $libdir
         libdir=$(pwd)
@@ -291,7 +319,6 @@ Describe "php"
         When run source "$libdir"/bin/php 5.6 "$libdir"/spec/phpversion.php
         The stdout should eq "5.6"
         The stderr should eq ""
-        # cd libdir
     End
     It "runs php in 5.6 by using container-exec"
         When run source ./bin/php container-exec php 5.6 spec/phpversion.php

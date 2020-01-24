@@ -21,11 +21,17 @@ RUN apt-get install make  &&\
     sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash &&\
     sudo bpkg install -g jclaveau/docker-php-multiversion
 
+
+ARG CACHEBUST=1
+
 # syncing configuration
 COPY dockerfiles/etc/nginx/sites-available/default /etc/nginx/sites-available/default
 COPY dockerfiles/etc/lsyncd.conf /etc/lsyncd.conf
+COPY dockerfiles/etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY dockerfiles/etc/apache2/ports.conf /etc/apache2/ports.conf
 COPY dockerfiles/etc/my_init.d/20-sync_log.sh /etc/my_init.d/20-sync_log.sh
 COPY dockerfiles/etc/my_init.d/30-sync_etc.sh /etc/my_init.d/30-sync_etc.sh
+COPY dockerfiles/etc/my_init.d/40-link_var_www_project.sh /etc/my_init.d/40-link_var_www_project.sh
 COPY dockerfiles/etc/my_init.d/99-start_services.sh /etc/my_init.d/99-start_services.sh
 COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_5-6/run
 COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-0/run
