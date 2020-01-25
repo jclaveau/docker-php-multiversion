@@ -21,6 +21,9 @@ script:
   - . ~/.profile
   - command -v php
   - git clone https://github.com/shellspec/shellspec.git
+  - export PHP_MULTIVERSION_IMAGE="latest"
+  - PHP_MULTIVERSION_IMAGE="latest" make test
+  - export PHP_MULTIVERSION_IMAGE=""
   - make test
 after_success:
   - bash <(curl -s https://codecov.io/bash) -s coverage;
