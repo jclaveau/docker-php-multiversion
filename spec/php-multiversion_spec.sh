@@ -284,31 +284,138 @@ Describe "php"
         The stderr should be blank
     End
     
-    It "serves php of the right version with apache2, nginx, php builtin webserver"
+    It "serves php of the right version with nginx"
         BeforeRun 'rm -rf ./etc'
         BeforeRun './bin/php rerun-container > /dev/null'
         BeforeRun 'sleep 2'
         serves_vhosts_with_the_expected_php_version() {
             ip_address="$(./bin/php container-ip)"
-            curl --silent http://"$ip_address":8000/spec/phpversion.php
-            curl --silent http://"$ip_address":8010/spec/phpversion.php
+            curl --silent http://"$ip_address":7056/spec/phpversion.php
+            curl --silent http://"$ip_address":7070/spec/phpversion.php
+            curl --silent http://"$ip_address":7071/spec/phpversion.php
+            curl --silent http://"$ip_address":7072/spec/phpversion.php
+            curl --silent http://"$ip_address":7073/spec/phpversion.php
+            curl --silent http://"$ip_address":7074/spec/phpversion.php
+
+            echo "";
+            echo "";
+            echo "";
+            echo "";
+            
+            curl --silent http://"$ip_address":7056/spec/server.php
+            curl --silent http://"$ip_address":7070/spec/server.php
+            curl --silent http://"$ip_address":7071/spec/server.php
+            curl --silent http://"$ip_address":7072/spec/server.php
+            curl --silent http://"$ip_address":7073/spec/server.php
+            curl --silent http://"$ip_address":7074/spec/server.php
+        }
+        When call serves_vhosts_with_the_expected_php_version
+        
+        The line 1 of stdout should eq "5.6"
+        The line 2 of stdout should eq "7.0"
+        The line 3 of stdout should eq "7.1"
+        The line 4 of stdout should eq "7.2"
+        The line 5 of stdout should eq "7.3"
+        The line 6 of stdout should eq "7.4"
+        The line 7 of stdout should be blank
+        
+        The line 11 of stdout should eq "nginx"
+        The line 12 of stdout should eq "nginx"
+        The line 13 of stdout should eq "nginx"
+        The line 14 of stdout should eq "nginx"
+        The line 15 of stdout should eq "nginx"
+        The line 16 of stdout should eq "nginx"
+        The line 17 of stdout should be blank
+        The stderr should be blank
+    End
+    
+    It "serves php of the right version with apache"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './bin/php rerun-container > /dev/null'
+        BeforeRun 'sleep 2'
+        serves_vhosts_with_the_expected_php_version() {
+            ip_address="$(./bin/php container-ip)"
             curl --silent http://"$ip_address":8056/spec/phpversion.php
             curl --silent http://"$ip_address":8070/spec/phpversion.php
             curl --silent http://"$ip_address":8071/spec/phpversion.php
             curl --silent http://"$ip_address":8072/spec/phpversion.php
             curl --silent http://"$ip_address":8073/spec/phpversion.php
             curl --silent http://"$ip_address":8074/spec/phpversion.php
+
+            echo "";
+            echo "";
+            echo "";
+            echo "";
+            
+            curl --silent http://"$ip_address":8056/spec/server.php
+            curl --silent http://"$ip_address":8070/spec/server.php
+            curl --silent http://"$ip_address":8071/spec/server.php
+            curl --silent http://"$ip_address":8072/spec/server.php
+            curl --silent http://"$ip_address":8073/spec/server.php
+            curl --silent http://"$ip_address":8074/spec/server.php
         }
         When call serves_vhosts_with_the_expected_php_version
-        The line 1 of stdout should eq "7.4"
-        The line 2 of stdout should eq "7.4"
-        The line 3 of stdout should eq "5.6"
-        The line 4 of stdout should eq "7.0"
-        The line 5 of stdout should eq "7.1"
-        The line 6 of stdout should eq "7.2"
-        The line 7 of stdout should eq "7.3"
-        The line 8 of stdout should eq "7.4"
-        The line 9 of stdout should be blank
+        
+        The line 1 of stdout should eq "5.6"
+        The line 2 of stdout should eq "7.0"
+        The line 3 of stdout should eq "7.1"
+        The line 4 of stdout should eq "7.2"
+        The line 5 of stdout should eq "7.3"
+        The line 6 of stdout should eq "7.4"
+        The line 7 of stdout should be blank
+        
+        The line 11 of stdout should eq "Apache"
+        The line 12 of stdout should eq "Apache"
+        The line 13 of stdout should eq "Apache"
+        The line 14 of stdout should eq "Apache"
+        The line 15 of stdout should eq "Apache"
+        The line 16 of stdout should eq "Apache"
+        The line 17 of stdout should be blank
+        The stderr should be blank
+    End
+    
+    It "serves php of the right version with PHP Development Server"
+        BeforeRun 'rm -rf ./etc'
+        BeforeRun './bin/php rerun-container > /dev/null'
+        BeforeRun 'sleep 2'
+        serves_vhosts_with_the_expected_php_version() {
+            ip_address="$(./bin/php container-ip)"
+            curl --silent http://"$ip_address":9056/spec/phpversion.php
+            curl --silent http://"$ip_address":9070/spec/phpversion.php
+            curl --silent http://"$ip_address":9071/spec/phpversion.php
+            curl --silent http://"$ip_address":9072/spec/phpversion.php
+            curl --silent http://"$ip_address":9073/spec/phpversion.php
+            curl --silent http://"$ip_address":9074/spec/phpversion.php
+
+            echo "";
+            echo "";
+            echo "";
+            echo "";
+            
+            curl --silent http://"$ip_address":9056/spec/server.php
+            curl --silent http://"$ip_address":9070/spec/server.php
+            curl --silent http://"$ip_address":9071/spec/server.php
+            curl --silent http://"$ip_address":9072/spec/server.php
+            curl --silent http://"$ip_address":9073/spec/server.php
+            curl --silent http://"$ip_address":9074/spec/server.php
+        }
+        When call serves_vhosts_with_the_expected_php_version
+        
+        The line 1 of stdout should eq "5.6"
+        The line 2 of stdout should eq "7.0"
+        The line 3 of stdout should eq "7.1"
+        The line 4 of stdout should eq "7.2"
+        The line 5 of stdout should eq "7.3"
+        The line 6 of stdout should eq "7.4"
+        The line 7 of stdout should be blank
+        
+        The line 11 of stdout should eq "PHP Development Server"
+        The line 12 of stdout should eq "PHP Development Server"
+        The line 13 of stdout should eq "PHP Development Server"
+        The line 14 of stdout should eq "PHP Development Server"
+        The line 15 of stdout should eq "PHP Development Server"
+        The line 16 of stdout should eq "PHP Development Server"
+        The line 17 of stdout should be blank
         The stderr should be blank
     End
     

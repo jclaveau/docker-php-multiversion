@@ -48,6 +48,6 @@ touch "$log_error_file"
     /usr/bin/php"$php_version" \
         -t "$PHPMV_WORKDIR" \
         $conf_option \
-        -S 0.0.0.0:80"$php_port" \
+        -S 0.0.0.0:90"$php_port" \
         $router_option \
      | tee "$log_access_file") 3>&1 1>&2 2>&3 | tee "$log_error_file"
