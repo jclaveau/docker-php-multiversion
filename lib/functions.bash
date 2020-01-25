@@ -89,6 +89,15 @@ function run_docker() {
     fi
 }
 
+# https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-an-array-in-bash
+function join_by() {
+    local d=$1;
+    shift;
+    echo -n "$1";
+    shift;
+    printf "%s" "${@/#/$d}";
+}
+
 function exec_in_docker() {
     # avoid https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
     local USE_TTY printenv_array_length environment_vars value inline_env input_command_parts command
@@ -111,11 +120,12 @@ function exec_in_docker() {
 
     inline_env=$(printf " --env %s" "${environment_vars[@]}")
 
-    input_command_parts=("$@")
-    command="docker exec -i ${USE_TTY} --user $(id -u):$(id -g) $inline_env $CONTAINER_NAME ${input_command_parts[*]}"
+    input_command_parts=\"$( join_by '" "' "$@" )\"
+    command="docker exec -i ${USE_TTY} --user $(id -u):$(id -g) $inline_env $CONTAINER_NAME $input_command_parts"
 
     # echo $command
     # echo ""
+    # exit
     eval "$command"
 }
 

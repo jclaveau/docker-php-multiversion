@@ -462,6 +462,12 @@ Describe "php"
         The line 1 of stdout should eq "7.4"
         The stderr should eq ""
     End
+    
+    It "runs php inline"
+        When run source ./bin/php -r "echo 'lala'; echo 'lolo';"
+        The stdout should eq "lalalolo"
+        The stderr should eq ""
+    End
 
     
     It "completes command line: php only"
