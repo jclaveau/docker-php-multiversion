@@ -53,3 +53,6 @@ apt-get install -y \
     php-xdebug\
     php-uopz\
     php-uuid
+
+# disable uopz by default to avoid breaking exit / die()
+phpdismod uopz

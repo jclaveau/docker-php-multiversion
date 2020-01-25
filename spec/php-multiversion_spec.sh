@@ -469,6 +469,12 @@ Describe "php"
         The stderr should eq ""
     End
 
+    It "has exit and die working by default"
+        # uopz disables exit/die by default
+        When run source ./bin/php -r "die('dead'); echo 'still alive due to uopz';"
+        The stdout should eq "dead"
+        The stderr should eq ""
+    End
     
     It "completes command line: php only"
         complete_suggestions() {
