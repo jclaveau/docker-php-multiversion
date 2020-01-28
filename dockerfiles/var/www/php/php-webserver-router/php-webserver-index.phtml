@@ -1,0 +1,184 @@
+<?php
+require 'php-webserver-functions.php';
+
+// exit;
+$columns = [
+    'name' => [
+        'id' => 'name',
+        'label' => 'Name',
+        'class' => '',
+        'style' => 'text-overflow: ellipsis;',
+        'view' => function ($file) { ?>
+            <a href="<?= $file['url'] ?>">
+                <i class="fas <?= $file['fa_class'] ?>"></i>
+                <?= $file['name'] ?>
+            </a>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['name'] <=> $file2['name'];
+        },
+    ],
+    'last_modified' => [
+        'id' => 'last_modified',
+        'label' => 'Last modified',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= date("Y-m-d H:i", filemtime($file['path'])) ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['last_modified'] <=> $file2['last_modified'];
+        },
+    ],
+    'size' => [
+        'id' => 'size',
+        'label' => 'Size',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= is_dir($file['path']) ? '-' : format_bytes(filesize($file['path'])) ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return (is_dir($file1['path']) ? null : filesize($file1['path']))
+                <=> (is_dir($file2['path']) ? null : filesize($file2['path']));
+        },
+    ],
+    'owner' => [
+        'id' => 'owner',
+        'label' => 'Owner',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= fileowner($file['path']) ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['owner'] <=> $file2['owner'];
+        },
+    ],
+    'group' => [
+        'id' => 'group',
+        'label' => 'Group',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= filegroup($file['path']) ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['group'] <=> $file2['group'];
+        },
+    ],
+    'permissions' => [
+        'id' => 'permissions',
+        'label' => 'Permissions',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= readable_fileperms($file['path']) ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['permissions'] <=> $file2['permissions'];
+        },
+    ],
+    'mime' => [
+        'id' => 'mime',
+        'label' => 'Mime-Type',
+        'class' => 'text-center',
+        'view' => function ($file) { ?>
+            <?= $file['mime'] ?>
+        <? },
+        'sorter' => function ($file1, $file2) {
+            return $file1['permissions'] <=> $file2['permissions'];
+        },
+    ],
+];
+
+$row = [];
+$files = scandir($path);
+foreach ($files as $file) {
+    if ($_SERVER['SCRIPT_NAME'] == '/' && $file == '..') {
+        continue;
+    }
+    
+    $row = [];
+    $row['name'] = $file;
+    $row['path'] = $path.'/'.$file;
+    $row['url'] = $_SERVER['SCRIPT_NAME'] == '/'
+         ? $_SERVER['SCRIPT_NAME'].$file
+         : $_SERVER['SCRIPT_NAME'].'/'.$file;
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $row['mime'] = finfo_file($finfo, $row['path']);
+    $type = preg_replace('#/.*$#', '', $row['mime']);
+    finfo_close($finfo);
+    
+    $row['fa_class'] = is_dir($row['path'])
+                     ? 'fa-folder'
+                     : fontawesome_class_by_mime($row['mime']);
+
+    foreach ($columns as $column) {
+        ob_start();
+        $column['view']($row);
+        $row[$column['id']] = trim(ob_get_contents());
+        ob_end_clean();
+    }
+    
+    $rows[] = $row;
+}
+
+$requested_sorting_column = $_GET['column'] ?? 'name';
+$requested_sorting_order  = $_GET['order']  ?? 'asc';
+
+usort($rows, $columns[$requested_sorting_column]['sorter']);
+if ($requested_sorting_order == 'desc') {
+    $rows = array_reverse($rows);
+}
+
+?>
+<!doctype html>
+<html>
+    <head>
+        <title>Index of <?= $_SERVER['SCRIPT_NAME'] ?></title>
+        <style type="text/css">
+            <?= inlinify_css(__DIR__ . '/vendor/fortawesome/font-awesome/css/all.css') ?>
+                        
+            <?= inlinify_css(__DIR__ . '/php-webserver-index.css') ?>            
+        </style>
+    </head>
+    <body>
+        <div id="background"></div>
+
+        <header>
+            <h1>Index of <?= breadcrumb($_SERVER['SCRIPT_NAME']) ?></h1>
+        </header>
+
+        <table>
+            <tr>
+                <?php foreach ($columns as $column) { ?>
+                <th>
+                    <a href="<?= column_link($column) ?>">
+                        <?= $column['label'] ?> <i class="fas <?= column_sort_icon($column) ?>"></i>
+                    </a>
+                </th>
+                <?php } ?>
+            </tr>
+                
+            <?php foreach ($rows as $file) { ?>
+            <tr>
+                <?php foreach ($columns as $column) { ?>
+                <td class="<?= $column['class'] ?>" style="<?= $column['style'] ?? '' ?>">
+                    <?= $file[$column['id']] ?>
+                </td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        
+        <footer>
+            <address>
+                <a href="?phpinfo-router">
+                    <?= $_SERVER['SERVER_SOFTWARE'] ?>
+                </a>
+                at
+                <a href="//<?= $_SERVER['SERVER_ADDR'] ?>">
+                    <?= $_SERVER['SERVER_ADDR'] ?>
+                </a>
+                Port <?= $_SERVER['SERVER_PORT'] ?>
+            </address>
+        </footer>
+    </body>
+</html>

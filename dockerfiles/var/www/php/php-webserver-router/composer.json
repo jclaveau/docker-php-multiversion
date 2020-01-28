@@ -1,0 +1,25 @@
+{
+    "name": "jclaveau/php-webserver-router",
+    "description": "Some options and UI for PHP Development Webserver",
+    "license": "MIT",
+    "type": "library",
+    "keywords": ["php webserver", "autoindex"],
+    "authors": [
+        {
+            "name": "Jean Claveau",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "require-dev": {
+        "fortawesome/font-awesome": "^5.12"
+    },
+    "autoload": {
+        "files": [
+            "php-webserver-functions.php"
+        ]
+    }
+}

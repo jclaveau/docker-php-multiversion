@@ -13,8 +13,9 @@ fi
 
 php_port=$(sed -e 's/\.//' <<< "$php_version")
 
-config_file="/etc/php/web-server/php-webserver-$php_version.ini"
-router_file="$PHPMV_WORKDIR/php-webserver-router.php"
+config_file="/etc/php/$php_version/fpm/php.ini"
+# router_file="$PHPMV_WORKDIR/php-webserver-router.php"
+router_file="$PHPMV_WORKDIR/dockerfiles/var/www/php/php-webserver-router/php-webserver-router.php"
 
 log_dir='/var/log/php-webserver'
 log_access_file="$log_dir/webserver_$php_version.access.log"
@@ -34,6 +35,9 @@ else
     conf_option=''
 fi
 
+# echo "service_name: $service_name"
+# echo "conf_option: $conf_option"
+
 if [ -f "$router_file" ]; then
     router_option="$router_file"
 else
@@ -43,6 +47,15 @@ fi
 mkdir -p "$log_dir"
 touch "$log_access_file"
 touch "$log_error_file"
+
+tmp_vars_file="$(dirname $router_file)"/tmp_vars_"$php_port".php
+rm "$tmp_vars_file"
+touch "$tmp_vars_file"
+echo "<?php " >> "$tmp_vars_file"
+echo "\$_SERVER['USER'] = '$USER';" >> "$tmp_vars_file"
+echo "\$_SERVER['DOCUMENT_ROOT'] = '$PHPMV_WORKDIR';" >> "$tmp_vars_file"
+echo "\$_SERVER['SERVER_ADDR'] = '$(ifconfig eth0 | grep -oP 'inet \K\S+')';" >> "$tmp_vars_file"
+
 
 (exec /sbin/setuser "$PHPMV_RUNNING_USER" \
     /usr/bin/php"$php_version" \
