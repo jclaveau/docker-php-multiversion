@@ -14,15 +14,16 @@ RUN ./install-tools-upgrade-repos.sh
 COPY dockerfiles/install-php-packages.sh .
 RUN ./install-php-packages.sh
 
-RUN apt-get update && apt-get install composer -y
-RUN apt-get upgrade -y
+RUN apt-get update \
+&& apt-get install composer -y \
+&& apt-get install make -y \
+&& apt-get install lsyncd -y \
+&& apt-get upgrade -y
 
-RUN apt-get install make  &&\
-    sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash &&\
-    sudo bpkg install -g jclaveau/docker-php-multiversion
-
+RUN sudo curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | sudo bash
 
 ARG CACHEBUST=1
+RUN sudo bpkg install -g jclaveau/docker-php-multiversion
 
 # syncing configuration
 COPY dockerfiles/etc/nginx/sites-available/default /etc/nginx/sites-available/default
@@ -40,10 +41,10 @@ COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_web
 COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-3/run
 COPY dockerfiles/etc/service/php_webserver/php_webserver.sh /etc/service/php_webserver_7-4/run
 COPY dockerfiles/etc/service/chown_log/chown_log_run.sh /etc/service/chown_log/run
+COPY dockerfiles/var/www/php/php-webserver-router /var/www/php/php-webserver-router
 
-RUN apt-get install lsyncd -y \
-    && chmod +x -R /etc/my_init.d/* \
-    && chmod +x -R /etc/service/*
+RUN chmod +x -R /etc/my_init.d/* \
+&&  chmod +x -R /etc/service/*
 
 RUN apt-get -y --purge autoremove &&\
     apt-get clean &&\

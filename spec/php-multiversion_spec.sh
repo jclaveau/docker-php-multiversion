@@ -263,7 +263,6 @@ Describe "php"
         The line 7 of stdout should eq " [ + ]  php7.3-fpm"
         The line 8 of stdout should eq " [ + ]  php7.4-fpm"
         The line 1 of stderr should eq " [ ? ]  hwclock.sh"
-        The line 2 of stderr should eq " [ ? ]  ubuntu-fan"
     End
     
     It " starts php builtin webserver services"

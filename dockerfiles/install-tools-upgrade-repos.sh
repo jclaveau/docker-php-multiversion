@@ -20,7 +20,7 @@ apt-get install -y \
     net-tools \
     zip \
     nginx \
-    docker.io
+    npm
 
 add-apt-repository -y ppa:ondrej/php
 apt-get update
