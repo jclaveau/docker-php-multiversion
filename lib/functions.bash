@@ -1,8 +1,41 @@
 #!/bin/bash
 
 function in_docker_container() {
-    # TODO check that the container is of jclaveau/php-multiversion
     if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function extract_hosts() {
+    cat /etc/hosts | grep '172.17.'
+}
+
+function extract_first_host() {
+    extract_hosts | awk '{ print $2}'
+}
+
+function extract_phpmv_hosts() {
+    extract_hosts | awk '$2 ~ /^phpmv_.+/ { print $2}'
+}
+
+function in_phpmv_container() {
+    if in_docker_container ; then
+        phpmv_host=$(extract_phpmv_hosts)
+        # echo "phpmv_host: $phpmv_host"
+        if [ -z "$phpmv_host" ]; then
+            return 1
+        else
+            return 0
+        fi
+    else
+        return 1
+    fi
+}
+
+function running_from_sibling() {
+    if ! in_phpmv_container && in_docker_container ; then
         return 0
     else
         return 1
@@ -33,16 +66,84 @@ function install_docker_if_missing() {
     fi
 }
 
+function replace_slashes_by_underscores() {
+    # shellcheck disable=SC2001
+    echo "$1" | sed "s|[^[:alpha:].-]|_|g"
+}
+
 function run_docker() {
     local lib_volume_option docker_image_version
 
     if ! docker ps -a | grep -q "$CONTAINER_NAME$"
     then
+        if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
+            # docker_image_version='0.5.3'
+            docker_image_version='latest'
+        else
+            docker_image_version=$PHP_MULTIVERSION_IMAGE
+        fi
+
+        volumes_option=''
+        if running_from_sibling; then
+            # this is what happends in Travis
+            HOST_SIBLING_NAME="$(extract_first_host)"
+            # echo "$HOST_SIBLING_NAME"
+            
+            # HOME_VOLUME="phpmv_"$HOST_SIBLING_NAME"_$(replace_slashes_by_underscores "$HOME")"
+            # docker volume create --name $HOME_VOLUME
+            HOME_VOLUME="$HOME"
+            ETC_VOLUME="phpmv_"$HOST_SIBLING_NAME"_$(replace_slashes_by_underscores "/etc")"
+            docker volume create --name $ETC_VOLUME > /dev/null
+            
+            LIBRARY_VOLUME="phpmv_"$HOST_SIBLING_NAME"_$(replace_slashes_by_underscores "$LIBRARY_DIR")"
+            docker volume create --name $LIBRARY_VOLUME > /dev/null
+
+            # run copier container
+            copier_cmd="docker run \
+                -d \
+                --rm \
+                --name=phpmv_copier \
+                --volume=$ETC_VOLUME:/volume_etc:rw \
+                --volume=$LIBRARY_VOLUME:/volume_pwd:rw \
+                phusion/baseimage:master /sbin/my_init"
+
+            docker kill 'phpmv_copier' 2>&1 /dev/null
+            copier_id="$(eval "$copier_cmd")"
+
+            if [ -z "$copier_id" ]; then
+                echo "Unable to start the copier container"
+                exit
+            fi
+
+
+            docker cp "$HOST_SIBLING_NAME":/etc/passwd /tmp/etc_passwd
+            docker cp "$HOST_SIBLING_NAME":/etc/group  /tmp/etc_group
+            docker cp "$HOST_SIBLING_NAME":/etc/passwd /tmp/etc_shadow
+            docker cp "$HOST_SIBLING_NAME":"$LIBRARY_DIR" /tmp/volume_pwd
+            docker cp /tmp/etc_passwd "$copier_id":/volume_etc/passwd
+            docker cp /tmp/etc_group  "$copier_id":/volume_etc/group
+            docker cp /tmp/etc_shadow "$copier_id":/volume_etc/shadow
+            
+            docker cp /tmp/volume_pwd "$copier_id":/
+            # SUDOERS_VOLUME="phpmv_$(replace_slashes_by_underscores "/etc/sudoers.d")"
+
+            etc_volume_option="--volume=$ETC_VOLUME:/volume_etc:ro"
+        else
+            etc_volume_option=("--volume=/etc/sudoers.d:/etc/sudoers.d:ro")
+            etc_volume_option+=("--volume=/etc/group:/etc/group:ro")
+            etc_volume_option+=("--volume=/etc/passwd:/etc/passwd:ro")
+            etc_volume_option+=("--volume=/etc/shadow:/etc/shadow:ro")
+            etc_volume_option="$(join_by ' ' "${etc_volume_option[@]}")"
+                # --volume="$HOME_VOLUME"/.composer:"$HOME"/.composer:rw 
+            HOME_VOLUME="$HOME"
+            LIBRARY_VOLUME="$LIBRARY_DIR"
+        fi
+
         # echo "Running new docker jclaveau/php-multiversion for $(pwd)"
         if [ "$HOME" != "$LIBRARY_DIR" ]; then
-            lib_volume_option="--volume $LIBRARY_DIR:$LIBRARY_DIR"
+            pwd_volume_option="--volume $LIBRARY_VOLUME:$LIBRARY_DIR"
         else
-            lib_volume_option=''
+            pwd_volume_option=''
         fi
 
         if [ -d "$LIBRARY_DIR/log" ]; then
@@ -52,40 +153,33 @@ function run_docker() {
         fi
 
         if [ -d "$LIBRARY_DIR/etc" ]; then
-            etc_volume_option="--volume=$LIBRARY_DIR/etc:/custom_etc"
+            custom_etc_volume_option="--volume=$LIBRARY_DIR/etc:/custom_etc"
         else
-            etc_volume_option=''
+            custom_etc_volume_option=''
         fi
 
-        if [ -z "${PHP_MULTIVERSION_IMAGE:-}" ]; then
-            docker_image_version='0.5.3'
-            # docker_image_version='latest'
-        else
-            docker_image_version=$PHP_MULTIVERSION_IMAGE
-        fi
-
-        run_stdin=$( docker run \
+        run_cmd="docker run \
             -d \
             --rm \
-            --volume="$HOME":"$HOME":ro \
-            --volume="$HOME"/.composer:"$HOME"/.composer:rw \
-            $lib_volume_option \
+            $pwd_volume_option \
             $etc_volume_option \
+            --volume=$HOME_VOLUME:$HOME:ro \
+            $custom_etc_volume_option \
             $log_volume_option \
-            --volume=/etc/group:/etc/group:ro \
-            --volume=/etc/passwd:/etc/passwd:ro \
-            --volume=/etc/shadow:/etc/shadow:ro \
-            --volume=/etc/sudoers.d:/etc/sudoers.d:ro \
-            --name "$CONTAINER_NAME" \
-            --workdir "$LIBRARY_DIR" \
-            --env PHPMV_RUNNING_USER="$USER" \
-            --env PHPMV_WORKDIR="$LIBRARY_DIR" \
-            jclaveau/php-multiversion:"$docker_image_version" /sbin/my_init \
-        )
+            --name $CONTAINER_NAME \
+            --hostname $CONTAINER_NAME.loc \
+            --workdir $LIBRARY_DIR \
+            --env PHPMV_RUNNING_USER=$USER \
+            --env PHPMV_WORKDIR=$LIBRARY_DIR \
+            jclaveau/php-multiversion:$docker_image_version /sbin/my_init \
+        "
+            # --network="bridge" \
         # Forcing /sbin/my_init without redirection to /dev/null ensures
         # the services and scripts are well run before a later container-exec
+         # echo $run_cmd
+         # exit
 
-        echo "$run_stdin" > /dev/null # comment for debug
+        eval "$run_cmd" > /dev/null # comment for debug
     fi
 }
 
@@ -135,7 +229,7 @@ function latest_php_version() {
 
 function kill_containers() {
     local container_ids
-    container_ids=$(docker ps --no-trunc --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^php-mv_.+/ { print $1}')
+    container_ids=$(docker ps --no-trunc --format '{{.ID}} {{.Names}}' | awk '$2 ~ /^phpmv_.+/ { print $1}')
 
     if [ -n "$container_ids" ]; then
         # echo $container_ids
@@ -175,7 +269,7 @@ function ps_container() {
 }
 
 function ps_containers() {
-    docker ps --filter "name=php-mv_" "$@"
+    docker ps --filter "name=phpmv_" "$@"
 }
 
 function container_id() {

@@ -1,29 +1,39 @@
 language: sh
-matrix:
+services:
+ - docker
+jobs:
   include:
-    - os: linux
-      dist: xenial
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y bash binutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev
-  - git clone https://github.com/SimonKagstrom/kcov.git
-  - cd kcov
-  - mkdir build; cd build; cmake ..; make -j4; sudo make install
-  - cd ../..
-  - docker pull jclaveau/php-multiversion:0.5.2
-  - docker pull jclaveau/php-multiversion:latest
+  - name: "latest"
+    env: PHP_MULTIVERSION_IMAGE="latest"
+    os: linux
+    dist: xenial
+  # - name: "stable"
+    # env: PHP_MULTIVERSION_IMAGE=
+    # os: linux
+    # dist: xenial
+# before_install:
+  # - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  # - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  # - sudo apt-get update
+  # - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+script:
+  - bash contrib/travis_before_script.sh
+  - docker pull jclaveau/php-multiversion:"$PHP_MULTIVERSION_IMAGE"
   - curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
   - echo $PATH
   - PATH=/home/travis/.local/bin:$PATH
-script:
   - shellcheck -x bin/* lib/*
   - bpkg install -g jclaveau/docker-php-multiversion
   - . ~/.profile
   - command -v php
-  - git clone https://github.com/shellspec/shellspec.git
-  - export PHP_MULTIVERSION_IMAGE="latest"
-  - PHP_MULTIVERSION_IMAGE="latest" make test
-  - export PHP_MULTIVERSION_IMAGE=""
+  # - docker network create -d bridge web
+  - php container-ip
+  - php container-exec cat /etc/hosts
+  # - curl http://localhost:7056/spec/phpversion.php
+  - curl http://"$(php container-ip)":7056/spec/phpversion.php
   - make test
+  - cat log/nginx/error.log 
+  - cat log/nginx/access.log 
+
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -s coverage;
+  - if [ -z "$PHP_MULTIVERSION_IMAGE" ]; then bash <(curl -s https://codecov.io/bash) -s coverage; fi

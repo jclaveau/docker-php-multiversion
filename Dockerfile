@@ -30,6 +30,7 @@ COPY dockerfiles/etc/nginx/sites-available/default /etc/nginx/sites-available/de
 COPY dockerfiles/etc/lsyncd.conf /etc/lsyncd.conf
 COPY dockerfiles/etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY dockerfiles/etc/apache2/ports.conf /etc/apache2/ports.conf
+COPY dockerfiles/etc/my_init.d/19-set_users_and_groups.sh /etc/my_init.d/19-set_users_and_groups.sh
 COPY dockerfiles/etc/my_init.d/20-sync_log.sh /etc/my_init.d/20-sync_log.sh
 COPY dockerfiles/etc/my_init.d/30-sync_etc.sh /etc/my_init.d/30-sync_etc.sh
 COPY dockerfiles/etc/my_init.d/40-link_var_www_project.sh /etc/my_init.d/40-link_var_www_project.sh
@@ -45,6 +46,16 @@ COPY dockerfiles/var/www/php/php-webserver-router /var/www/php/php-webserver-rou
 
 RUN chmod +x -R /etc/my_init.d/* \
 &&  chmod +x -R /etc/service/*
+
+# create /volume_etc
+# move /etc/passwd /etc/group /etc/shadow
+RUN mkdir /volume_etc \
+&&  mv /etc/passwd /volume_etc \
+&&  mv /etc/group  /volume_etc \
+&&  mv /etc/shadow /volume_etc \
+&&  ln -s /volume_etc/passwd /etc/passwd \
+&&  ln -s /volume_etc/group  /etc/group \
+&&  ln -s /volume_etc/shadow /etc/shadow
 
 RUN apt-get -y --purge autoremove &&\
     apt-get clean &&\

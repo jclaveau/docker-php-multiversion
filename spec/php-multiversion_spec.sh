@@ -16,7 +16,7 @@ Describe "php"
     End
     It "runs php in default version (default)"
         LIBRARY_DIR=$(pwd)
-        CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+        CONTAINER_NAME=phpmv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
         run_docker
         latest_version=$(latest_php_version)
 
@@ -26,7 +26,7 @@ Describe "php"
     End
     It "runs php in default version (latest)"
         LIBRARY_DIR=$(pwd)
-        CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+        CONTAINER_NAME=phpmv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
         run_docker $(pwd)
         latest_version=$(latest_php_version)
 
@@ -44,7 +44,7 @@ Describe "php"
         if [ -d "$script_dir"/bin ]; then
             script_dir="$script_dir"/bin
         fi
-        ln -s $script_dir/php /tmp/php_for_testing
+        ln -s -f $script_dir/php /tmp/php_for_testing
         When run source /tmp/php_for_testing 5.6 spec/phpversion.php
         rm /tmp/php_for_testing
         The stdout should eq "5.6"
@@ -92,7 +92,7 @@ Describe "php"
     It "lists container"
         BeforeRun './bin/php -v > /dev/null'
         When run ./bin/php container --format {{.Names}}
-        The line 1 of stdout should match "php-mv_*_docker-php-multiversion"
+        The line 1 of stdout should match "phpmv_*_docker-php-multiversion"
         The line 2 of stdout should be blank
         The stderr should eq ""
     End
@@ -104,8 +104,8 @@ Describe "php"
         BeforeRun '../bin/php -v > /dev/null'
         BeforeRun 'cd ..'
         When run ./bin/php containers --format {{.Names}}
-        The line 1 of stdout should match "php-mv_*_docker-php-multiversion_tmp"
-        The line 2 of stdout should match "php-mv_*_docker-php-multiversion"
+        The line 1 of stdout should match "phpmv_*_docker-php-multiversion_tmp"
+        The line 2 of stdout should match "phpmv_*_docker-php-multiversion"
         The line 3 of stdout should be blank
         The stderr should eq ""
     End
@@ -283,7 +283,7 @@ Describe "php"
         The stderr should be blank
     End
     
-    It "serves php of the right version with nginx"
+    fIt "serves php of the right version with nginx"
         BeforeRun 'rm -rf ./etc'
         BeforeRun './bin/php rerun-container > /dev/null'
         BeforeRun 'sleep 2'
@@ -310,6 +310,7 @@ Describe "php"
         }
         When call serves_vhosts_with_the_expected_php_version
         
+        # The stdout should eq ""
         The line 1 of stdout should eq "5.6"
         The line 2 of stdout should eq "7.0"
         The line 3 of stdout should eq "7.1"

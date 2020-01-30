@@ -11,8 +11,10 @@ all:
 
 .PHONY: install
 install:
+	mkdir -p $(PREFIX)/lib/php
 	cp -v -f -r ./* $(PREFIX)/lib/php
 	ln -v -f -s $(PREFIX)/lib/php/bin/php $(PREFIX)/bin/php
+	mkdir -p $(PREFIX)/share/bash-completion/completions/
 	ln -v -f -s $(PREFIX)/lib/php/share/bash-completion/completions/php.bash \
 				$(PREFIX)/share/bash-completion/completions/php.bash
 

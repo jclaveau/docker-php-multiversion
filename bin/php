@@ -17,7 +17,7 @@ fi
 
 LIBRARY_DIR="$(pwd)"
 # shellcheck disable=SC2001
-CONTAINER_NAME=php-mv'_'$(echo "$LIBRARY_DIR" | sed "s|[^[:alpha:].-]|_|g")
+CONTAINER_NAME=phpmv'_'"$(replace_slashes_by_underscores "$LIBRARY_DIR")"
 
 versions=()
 
@@ -147,7 +147,7 @@ if [ ${#versions[@]} == 0 ]; then
     versions+=("")
 fi
 
-if in_docker_container; then
+if in_phpmv_container ; then
     # we do not need to restart a container with php multiversion as we already are in
     for version in "${versions[@]}";
     do
