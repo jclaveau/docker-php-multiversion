@@ -14,8 +14,8 @@ fi
 php_port=$(sed -e 's/\.//' <<< "$php_version")
 
 config_file="/etc/php/$php_version/fpm/php.ini"
-# router_file="$PHPMV_WORKDIR/php-webserver-router.php"
-router_file="$PHPMV_WORKDIR/dockerfiles/var/www/php/php-webserver-router/php-webserver-router.php"
+router_file="/var/www/php/php-webserver-router/php-webserver-router.php"
+# router_file="$PHPMV_WORKDIR/dockerfiles/var/www/php/php-webserver-router/php-webserver-router.php"
 
 log_dir='/var/log/php-webserver'
 log_access_file="$log_dir/webserver_$php_version.access.log"

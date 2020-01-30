@@ -128,15 +128,17 @@ if ($requested_sorting_order == 'desc') {
     $rows = array_reverse($rows);
 }
 
+$fontawesome_style = inlinify_css(__DIR__ . '/vendor/fortawesome/font-awesome/css/all.css');
+$indexer_style     = inlinify_css(__DIR__ . '/php-webserver-index.css');
 ?>
 <!doctype html>
 <html>
     <head>
         <title>Index of <?= $_SERVER['SCRIPT_NAME'] ?></title>
         <style type="text/css">
-            <?= inlinify_css(__DIR__ . '/vendor/fortawesome/font-awesome/css/all.css') ?>
+            <?= $fontawesome_style ?>
                         
-            <?= inlinify_css(__DIR__ . '/php-webserver-index.css') ?>            
+            <?= $indexer_style ?>            
         </style>
     </head>
     <body>
